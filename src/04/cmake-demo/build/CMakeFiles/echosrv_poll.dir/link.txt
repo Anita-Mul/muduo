@@ -1,0 +1,1 @@
+g++ -g -Wall -rdynamic CMakeFiles/echosrv_poll.dir/echosrv_poll.cpp.o -o bin/echosrv_poll 

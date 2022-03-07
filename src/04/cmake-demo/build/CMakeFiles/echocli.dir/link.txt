@@ -1,0 +1,1 @@
+g++ -g -Wall -rdynamic CMakeFiles/echocli.dir/echocli.cpp.o -o bin/echocli 

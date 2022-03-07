@@ -1,0 +1,4 @@
+/mnt/hgfs/虚拟机共享/muduo/src/04/cmake-demo/build/CMakeFiles/echosrv_poll.dir
+/mnt/hgfs/虚拟机共享/muduo/src/04/cmake-demo/build/CMakeFiles/echocli.dir
+/mnt/hgfs/虚拟机共享/muduo/src/04/cmake-demo/build/CMakeFiles/edit_cache.dir
+/mnt/hgfs/虚拟机共享/muduo/src/04/cmake-demo/build/CMakeFiles/rebuild_cache.dir
