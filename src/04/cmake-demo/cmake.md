@@ -43,3 +43,7 @@
     ```js
     sed -i 's/\r$//' build.sh
     ```
+ - 删除
+    ```js
+    ./build.sh clean
+    ```

@@ -18,6 +18,12 @@
 #include <algorithm>
 #include <iostream>
 
+/**
+ * poll 模型
+ * 每次调用 poll 函数的时候，都需要把监听套接字与自己所感兴趣的事件数组，拷贝到内核
+ * epoll 不需要拷贝
+ */
+
 typedef std::vector<struct epoll_event> EventList;
 
 #define ERR_EXIT(m) \
@@ -53,8 +59,11 @@ int main(void)
 	if (listen(listenfd, SOMAXCONN) < 0)
 		ERR_EXIT("listen");
 
+	// 客户端 accept 向量
 	std::vector<int> clients;
+
 	int epollfd;
+	// 这是这个参数唯一的有效值，如果这个参数设置为这个。那么当进程替换映像的时候会关闭这个文件描述符，这样新的映像中就无法对这个文件描述符操作，适用于多进程编程+映像替换的环境里
 	epollfd = epoll_create1(EPOLL_CLOEXEC);
 
 	struct epoll_event event;
@@ -70,9 +79,12 @@ int main(void)
 	int nready;
 	while (1)
 	{
+		// 返回的事件都放在 event 里面
 		nready = epoll_wait(epollfd, &*events.begin(), static_cast<int>(events.size()), -1);
+		
 		if (nready == -1)
 		{
+			// 如果资源没准备好，那此时可能会设置错误码为EINTR
 			if (errno == EINTR)
 				continue;
 			
@@ -81,6 +93,7 @@ int main(void)
 		if (nready == 0)	// nothing happended
 			continue;
 
+		// 增大容量
 		if ((size_t)nready == events.size())
 			events.resize(events.size()*2);
 
