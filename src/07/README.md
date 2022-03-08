@@ -56,8 +56,49 @@ yum install openssl
 yum install protobuf
 ```
 ## 编译 muduo
- - `./build.sh -j2`
- - 当出现100%时，muduo库安装完毕
+###### `./build.sh -j2` 表示用两个线程来编译
+ -  当出现100%时，muduo库安装完毕
+    编译 muduo 库和它自带的例子，生成的可执行文件和静态库文件
+    分别位于 `../build/release-cppll/{bin, lib}`
+ - 编译好之后，在 muduo 文件夹下会出现一个 build 文件夹
+ - 打开 build 文件夹，会出现 release-cppll 文件夹，打开之后，在 bin 文件夹之下就是存放着可执行文件
+ - 运行一个示例
+    ```
+    ./inspector_test
+    20220308 06:52:13.504231Z 30803 WARN  HttpServer[Inspector:test] starts listening on 0.0.0.0:12345 - HttpServer.cc:53
+    ```
+    ```
+    在浏览器中访问 0.0.0.0:12345
+
+    /proc/overview             print basic overview
+    /proc/pid                  print pid
+    /proc/status               print /proc/self/status
+    /proc/threads              list /proc/self/task
+    /sys/cpuinfo               print /proc/cpuinfo
+    /sys/loadavg               print /proc/loadavg
+    /sys/meminfo               print /proc/meminfo
+    /sys/overview              print system overview
+    /sys/stat                  print /proc/stat
+    /sys/version               print /proc/version
+
+    0.0.0.0:12345/proc/status 当访问这里时，可以知道服务器当前的状态
+    ```
+ - 在 lib 文件夹下可以看一些编译好的静态库
+    ```
+    libmuduo_base.a  libmuduo_http.a  libmuduo_inspect.a  libmuduo_net.a  libmuduo_pubsub.a
+
+    核心只有 base 和 net 库
+    ```
+
+###### `./build.sh install`
+ - 以上命令将 muduo 头文件和库文件安装到 `../build/release-install-cpp11/{include, lib}`
+
+
+## 编译 release 版
+###### `BUILD_TYPE=release ./build.sh -j2`
+ - 编译 muduo 库和它自带的例子，生成的可执行文件和静态库文件分别位于 `../build/release/{bin, lib}`
+###### `BUILD_TYPE=release ./build.sh install`
+ - 以上命令将 muduo 头文件和库文件安装到 `../build/release-install/{include, lib}`
 
 ## source insight4.0 破解版下载及使用方法
  - 按照这个教程
@@ -69,3 +110,4 @@ yum install protobuf
  - 第二步是将下载好setup程序的那个文件夹打开，删除掉里面的sourceinsight4.exe文件
  - 然后再将压缩包里的sourceinsight4.exe文件移动到setup程序的那个文件夹
  - 第四步人家让选择一个.lic文件，你就选压缩包里的
+
