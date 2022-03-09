@@ -2,15 +2,8 @@
 #include <iostream>
 using namespace std;
 
-
-Thread::Thread() : autoDelete_(false)
+Thread::Thread(const ThreadFunc& func) : func_(func), autoDelete_(false)
 {
-	cout<<"Thread ..."<<endl;
-}
-
-Thread::~Thread()
-{
-	cout<<"~Thread ..."<<endl;
 }
 
 void Thread::Start()
@@ -25,7 +18,6 @@ void Thread::Join()
 
 void* Thread::ThreadRoutine(void* arg)
 {
-	// static_cast 是强制类型转换为 Thread*
 	Thread* thread = static_cast<Thread*>(arg);
 	thread->Run();
 	if (thread->autoDelete_)
@@ -36,4 +28,9 @@ void* Thread::ThreadRoutine(void* arg)
 void Thread::SetAutoDelete(bool autoDelete)
 {
 	autoDelete_ = autoDelete;
+}
+
+void Thread::Run()
+{
+	func_();
 }

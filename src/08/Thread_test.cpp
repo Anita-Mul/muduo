@@ -5,28 +5,28 @@ using namespace std;
 
 class TestThread : public Thread
 {
-public:
-	TestThread(int count) : count_(count)
-	{
-		cout<<"TestThread ..."<<endl;
-	}
-
-	~TestThread()
-	{
-		cout<<"~TestThread ..."<<endl;
-	}
-
-private:
-	void Run()
-	{
-		while (count_--)
+	public:
+		TestThread(int count) : count_(count)
 		{
-			cout<<"this is a test ..."<<endl;
-			sleep(1);
+			cout<<"TestThread ..."<<endl;
 		}
-	}
 
-	int count_;
+		~TestThread()
+		{
+			cout<<"~TestThread ..."<<endl;
+		}
+
+	private:
+		void Run()
+		{
+			while (count_--)
+			{
+				cout<<"this is a test ..."<<endl;
+				sleep(1);
+			}
+		}
+
+		int count_;
 };
 
 int main(void)
