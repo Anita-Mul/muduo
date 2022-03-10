@@ -7,10 +7,10 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(CXX_FLAGS
- -g
+ -g                         # 生成调试信息
  # -DVALGRIND
  # -DMUDUO_STD_STRING
- -D_FILE_OFFSET_BITS=64
+ -D_FILE_OFFSET_BITS=64     # 定义一个宏
  -Wall
  -Wextra
  -Werror
@@ -65,4 +65,3 @@ add_subdirectory(muduo/base)
 #  endif()
 #endif()
 
-add_subdirectory(tests)
