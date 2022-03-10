@@ -30,6 +30,8 @@
 ## Thread 类图
 ![avatar](./src/1.PNG)
  - 定义 Thread 具体类
+
+
 ![avatar](./src/2.PNG)
 
 

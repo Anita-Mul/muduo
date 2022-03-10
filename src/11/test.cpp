@@ -6,18 +6,18 @@ void foo(int x)
 
 class B
 {
-public:
-	virtual void foo()
-	{
-	}
+	public:
+		virtual void foo()
+		{
+		}
 };
 
 class D : public B
 {
-public:
-	void foo(int x)
-	{
-	}
+	public:
+		void foo(int x)
+		{
+		}
 };
 
 template<typename To, typename From>
