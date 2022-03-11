@@ -1,0 +1,12 @@
+digraph "thread_test" {
+node [
+  fontsize = "12"
+];
+    "node3" [ label = "thread_test", shape = egg ];
+    "node0" [ label = "muduo_base", shape = octagon ];
+    "node3" -> "node0" [ style = dotted ] // thread_test -> muduo_base
+    "node1" [ label = "pthread", shape = septagon ];
+    "node0" -> "node1"  // muduo_base -> pthread
+    "node2" [ label = "rt", shape = septagon ];
+    "node0" -> "node2"  // muduo_base -> rt
+}

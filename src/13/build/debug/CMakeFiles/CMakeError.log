@@ -1,0 +1,65 @@
+Performing C++ SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_aca5a/fast && gmake: Warning: File `Makefile' has modification time 0.25 s in the future
+/usr/bin/gmake  -f CMakeFiles/cmTC_aca5a.dir/build.make CMakeFiles/cmTC_aca5a.dir/build
+gmake[1]: 进入目录“/mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp”
+gmake[1]: Warning: File `CMakeFiles/cmTC_aca5a.dir/flags.make' has modification time 0.24 s in the future
+Building CXX object CMakeFiles/cmTC_aca5a.dir/src.cxx.o
+/usr/bin/c++ -DCMAKE_HAVE_LIBC_PTHREAD  -g -D_FILE_OFFSET_BITS=64 -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -march=native -rdynamic  -o CMakeFiles/cmTC_aca5a.dir/src.cxx.o -c /mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_aca5a
+/usr/local/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aca5a.dir/link.txt --verbose=1
+/usr/bin/c++ -g -D_FILE_OFFSET_BITS=64 -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -march=native -rdynamic  -rdynamic CMakeFiles/cmTC_aca5a.dir/src.cxx.o -o cmTC_aca5a 
+CMakeFiles/cmTC_aca5a.dir/src.cxx.o：在函数‘main’中：
+/mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp/src.cxx:11：对‘pthread_create’未定义的引用
+/mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp/src.cxx:12：对‘pthread_detach’未定义的引用
+/mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp/src.cxx:13：对‘pthread_cancel’未定义的引用
+/mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp/src.cxx:14：对‘pthread_join’未定义的引用
+/mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp/src.cxx:15：对‘pthread_atfork’未定义的引用
+collect2: 错误：ld 返回 1
+gmake[1]: *** [cmTC_aca5a] 错误 1
+gmake[1]: 离开目录“/mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp”
+gmake: *** [cmTC_aca5a/fast] 错误 2
+
+
+Source file was:
+#include <pthread.h>
+
+static void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_cancel(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_96b76/fast && gmake: Warning: File `Makefile' has modification time 0.64 s in the future
+/usr/bin/gmake  -f CMakeFiles/cmTC_96b76.dir/build.make CMakeFiles/cmTC_96b76.dir/build
+gmake[1]: 进入目录“/mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp”
+gmake[1]: Warning: File `CMakeFiles/cmTC_96b76.dir/flags.make' has modification time 0.62 s in the future
+Building CXX object CMakeFiles/cmTC_96b76.dir/CheckFunctionExists.cxx.o
+/usr/bin/c++   -g -D_FILE_OFFSET_BITS=64 -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -march=native -rdynamic -DCHECK_FUNCTION_EXISTS=pthread_create -o CMakeFiles/cmTC_96b76.dir/CheckFunctionExists.cxx.o -c /mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CheckLibraryExists/CheckFunctionExists.cxx
+Linking CXX executable cmTC_96b76
+/usr/local/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTC_96b76.dir/link.txt --verbose=1
+/usr/bin/c++ -g -D_FILE_OFFSET_BITS=64 -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -march=native -rdynamic -DCHECK_FUNCTION_EXISTS=pthread_create -rdynamic CMakeFiles/cmTC_96b76.dir/CheckFunctionExists.cxx.o -o cmTC_96b76  -lpthreads 
+/usr/bin/ld: 找不到 -lpthreads
+collect2: 错误：ld 返回 1
+gmake[1]: *** [cmTC_96b76] 错误 1
+gmake[1]: 离开目录“/mnt/hgfs/虚拟机共享/muduo/src/13/build/debug/CMakeFiles/CMakeTmp”
+gmake: *** [cmTC_96b76/fast] 错误 2
+
+
+
