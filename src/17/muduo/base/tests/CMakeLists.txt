@@ -1,0 +1,3 @@
+add_executable(singleton_test Singleton_test.cc)
+target_link_libraries(singleton_test muduo_base)
+

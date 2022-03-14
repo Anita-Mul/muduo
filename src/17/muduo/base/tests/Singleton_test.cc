@@ -1,0 +1,56 @@
+#include <muduo/base/Singleton.h>
+#include <muduo/base/CurrentThread.h>
+#include <muduo/base/Thread.h>
+
+#include <boost/noncopyable.hpp>
+#include <stdio.h>
+
+// 把 Test 做成一个单例的类
+class Test : boost::noncopyable
+{
+    public:
+        Test()
+        {
+          printf("tid=%d, constructing %p\n", muduo::CurrentThread::tid(), this);
+        }
+
+        ~Test()
+        {
+          printf("tid=%d, destructing %p %s\n", muduo::CurrentThread::tid(), this, name_.c_str());
+        }
+
+        const muduo::string& name() const { return name_; }
+        void setName(const muduo::string& n) { name_ = n; }
+
+    private:
+        muduo::string name_;
+};
+
+void threadFunc()
+{
+    printf("tid=%d, %p name=%s\n",
+          muduo::CurrentThread::tid(),
+          &muduo::Singleton<Test>::instance(),
+          muduo::Singleton<Test>::instance().name().c_str());
+    muduo::Singleton<Test>::instance().setName("only one, changed");
+}
+
+int main()
+{
+    muduo::Singleton<Test>::instance().setName("only one");
+    muduo::Thread t1(threadFunc);
+    t1.start();
+    t1.join();
+    printf("tid=%d, %p name=%s\n",
+          muduo::CurrentThread::tid(),
+          &muduo::Singleton<Test>::instance(),
+          muduo::Singleton<Test>::instance().name().c_str());
+}
+
+
+/*
+tid=16492, constructing 0x1107010
+tid=16493, 0x1107010 name=only one
+tid=16492, 0x1107010 name=only one, changed
+tid=16492, destructing 0x1107010 only one, changed
+*/

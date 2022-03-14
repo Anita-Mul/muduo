@@ -1,0 +1,2 @@
+add_executable(threadlocal_test ThreadLocal_test.cc)
+target_link_libraries(threadlocal_test muduo_base)
