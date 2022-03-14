@@ -1,0 +1,9 @@
+add_executable(blockingqueue_test BlockingQueue_test.cc)
+target_link_libraries(blockingqueue_test muduo_base)
+
+add_executable(blockingqueue_bench BlockingQueue_bench.cc)
+target_link_libraries(blockingqueue_bench muduo_base)
+
+add_executable(boundedblockingqueue_test BoundedBlockingQueue_test.cc)
+target_link_libraries(boundedblockingqueue_test muduo_base)
+
