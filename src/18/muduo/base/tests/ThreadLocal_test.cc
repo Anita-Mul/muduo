@@ -25,7 +25,7 @@ class Test : boost::noncopyable
         std::string name_;
 };
 
-// 每个线程都有这样的对象
+// 每个线程都有自己的testObj1
 muduo::ThreadLocal<Test> testObj1;
 muduo::ThreadLocal<Test> testObj2;
 
@@ -71,6 +71,7 @@ tid=17521, constructing 0x1b0d040
 tid=17521, obj1 0x1b0d040 name=main one
 tid=17521, constructing 0x1b0d060
 tid=17521, obj2 0x1b0d060 name=
+
 tid=17522, constructing 0x7f23dc0008c0
 tid=17522, obj1 0x7f23dc0008c0 name=
 tid=17522, constructing 0x7f23dc0008e0
@@ -79,6 +80,7 @@ tid=17522, obj1 0x7f23dc0008c0 name=changed 1
 tid=17522, obj2 0x7f23dc0008e0 name=changed 42
 tid=17522, destructing 0x7f23dc0008c0 changed 1
 tid=17522, destructing 0x7f23dc0008e0 changed 42
+
 tid=17521, obj1 0x1b0d040 name=main one
 tid=17521, obj2 0x1b0d060 name=main two
 tid=17521, destructing 0x1b0d040 main one
