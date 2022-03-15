@@ -17,27 +17,32 @@ namespace muduo
                                 bool threadSafe = true,
                                 int flushInterval = 3);
                         ~LogFile();
-
+                        
+                        // 添加到日志文件当中
                         void append(const char* logline, int len);
+                        // 清空缓冲区
                         void flush();
 
-                        private:
+                private:
+                        // 不加锁的方式添加
                         void append_unlocked(const char* logline, int len);
 
                         static string getLogFileName(const string& basename, time_t* now);
+                        // 滚动日志
                         void rollFile();
 
-                        const string basename_;		// ��־�ļ�basename
-                        const size_t rollSize_;		// ��־�ļ��ﵽrolSize_��һ�����ļ�
-                        const int flushInterval_;		// ��־д����ʱ��
+                        const string basename_;		// 日志文件的 basename
+                        const size_t rollSize_;		// 日志文件达到 rolSize 换一个新文件
+                        const int flushInterval_;       // 日志写入间隔时间
 
                         int count_;
 
                         boost::scoped_ptr<MutexLock> mutex_;
-                        time_t startOfPeriod_;	// ��ʼ��¼��־ʱ�䣨����������ʱ�䣩
-                        time_t lastRoll_;			// ��һ�ι�����־�ļ�ʱ��
-                        time_t lastFlush_;		// ��һ����־д���ļ�ʱ��
-                        class File;
+                        time_t startOfPeriod_;	        // 开始记录日志时间（调整至零点的时间）
+                        time_t lastRoll_;		// 上一次滚动日志文件时间
+                        time_t lastFlush_;		// 上一次日志写入文件时间
+                        class File;                     // 自定义文件类
+                        //  boost::scoped_ptr 智能指针，它能够保证在离开作用域后对象被自动释放
                         boost::scoped_ptr<File> file_;
 
                         const static int kCheckTimeRoll_ = 1024;

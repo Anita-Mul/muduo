@@ -57,6 +57,7 @@ int FileUtil::SmallFile::readToString(int maxSize,
         {
             struct stat statbuf;
 
+            // 获取文件信息到 statbuf
             if (::fstat(fd_, &statbuf) == 0)
             {
                 if (S_ISREG(statbuf.st_mode))
@@ -83,6 +84,7 @@ int FileUtil::SmallFile::readToString(int maxSize,
             }
         }
 
+        // 读取文件内容到 content 中
         while (content->size() < implicit_cast<size_t>(maxSize))
         {
             size_t toRead = std::min(implicit_cast<size_t>(maxSize) - content->size(), sizeof(buf_));
@@ -113,6 +115,7 @@ int FileUtil::SmallFile::readToBuffer(int* size)
 
     if (fd_ >= 0)
     {
+        // pread 可以从一个指定的偏移位置来读取文件内容
         ssize_t n = ::pread(fd_, buf_, sizeof(buf_)-1, 0);
         
         if (n >= 0)
@@ -132,6 +135,8 @@ int FileUtil::SmallFile::readToBuffer(int* size)
     return err;
 }
 
+
+
 template int FileUtil::readFile(StringPiece filename,
                                 int maxSize,
                                 string* content,
@@ -142,15 +147,18 @@ template int FileUtil::SmallFile::readToString(
     string* content,
     int64_t*, int64_t*, int64_t*);
 
-#ifndef MUDUO_STD_STRING
-template int FileUtil::readFile(StringPiece filename,
-                                int maxSize,
-                                std::string* content,
-                                int64_t*, int64_t*, int64_t*);
 
-template int FileUtil::SmallFile::readToString(
-    int maxSize,
-    std::string* content,
-    int64_t*, int64_t*, int64_t*);
+
+
+#ifndef MUDUO_STD_STRING
+    template int FileUtil::readFile(StringPiece filename,
+                                    int maxSize,
+                                    std::string* content,
+                                    int64_t*, int64_t*, int64_t*);
+
+    template int FileUtil::SmallFile::readToString(
+        int maxSize,
+        std::string* content,
+        int64_t*, int64_t*, int64_t*);
 #endif
 

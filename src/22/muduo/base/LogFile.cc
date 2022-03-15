@@ -11,64 +11,65 @@ using namespace muduo;
 // not thread safe
 class LogFile::File : boost::noncopyable
 {
-  public:
-      explicit File(const string& filename)
-        : fp_(::fopen(filename.data(), "ae")),
-          writtenBytes_(0)
-      {
-          assert(fp_);
-          ::setbuffer(fp_, buffer_, sizeof buffer_);
-          // posix_fadvise POSIX_FADV_DONTNEED ?
-      }
+    public:
+        explicit File(const string& filename)
+            : fp_(::fopen(filename.data(), "ae")),
+            writtenBytes_(0)
+        {
+            // 创建文件并将缓冲区中的内容写入文件
+            assert(fp_);
+            ::setbuffer(fp_, buffer_, sizeof buffer_);
+            // posix_fadvise POSIX_FADV_DONTNEED ?
+        }
 
-      ~File()
-      {
-          ::fclose(fp_);
-      }
+        ~File()
+        {
+            ::fclose(fp_);
+        }
 
-      void append(const char* logline, const size_t len)
-      {
-          size_t n = write(logline, len);
-          size_t remain = len - n;
-          
-          while (remain > 0)
-          {
-              size_t x = write(logline + n, remain);
+        void append(const char* logline, const size_t len)
+        {
+            size_t n = write(logline, len);
+            size_t remain = len - n;
+            
+            while (remain > 0)
+            {
+                size_t x = write(logline + n, remain);
 
-              if (x == 0)
-              {
-                  int err = ferror(fp_);
-                  if (err)
-                  {
-                      fprintf(stderr, "LogFile::File::append() failed %s\n", strerror_tl(err));
-                  }
-                  break;
-              }
+                if (x == 0)
+                {
+                    int err = ferror(fp_);
+                    if (err)
+                    {
+                        fprintf(stderr, "LogFile::File::append() failed %s\n", strerror_tl(err));
+                    }
+                    break;
+                }
 
-              n += x;
-              remain = len - n; // remain -= x
-          }
+                n += x;
+                remain = len - n; // remain -= x
+            }
 
-          writtenBytes_ += len;
-      }
+            writtenBytes_ += len;
+        }
 
-      void flush()
-      {
-          ::fflush(fp_);
-      }
+        void flush()
+        {
+            ::fflush(fp_);
+        }
 
-      size_t writtenBytes() const { return writtenBytes_; }
+        size_t writtenBytes() const { return writtenBytes_; }
 
-  private:
-      size_t write(const char* logline, size_t len)
-      {
-          #undef fwrite_unlocked
-          return ::fwrite_unlocked(logline, 1, len, fp_);
-      }
+    private:
+        size_t write(const char* logline, size_t len)
+        {
+            #undef fwrite_unlocked
+            return ::fwrite_unlocked(logline, 1, len, fp_);
+        }
 
-      FILE* fp_;
-      char buffer_[64*1024];
-      size_t writtenBytes_;
+        FILE* fp_;
+        char buffer_[64*1024];         
+        size_t writtenBytes_;          // 已写入字节数
 };
 
 LogFile::LogFile(const string& basename,
@@ -120,6 +121,7 @@ void LogFile::flush()
 
 void LogFile::append_unlocked(const char* logline, int len)
 {
+    // 写入这个文件
     file_->append(logline, len);
 
     if (file_->writtenBytes() > rollSize_)
@@ -128,18 +130,21 @@ void LogFile::append_unlocked(const char* logline, int len)
     }
     else
     {
+        // count_ 是写入文件的次数
         if (count_ > kCheckTimeRoll_)
         {
             count_ = 0;
             time_t now = ::time(NULL);
             time_t thisPeriod_ = now / kRollPerSeconds_ * kRollPerSeconds_;
             
+            // 第二天的 0 点
             if (thisPeriod_ != startOfPeriod_)
             {
                 rollFile();
             }
             else if (now - lastFlush_ > flushInterval_)
             {
+                // 是否需要flush
                 lastFlush_ = now;
                 file_->flush();
             }
@@ -151,24 +156,34 @@ void LogFile::append_unlocked(const char* logline, int len)
     }
 }
 
+// 相当于创建新文件，将缓冲区数据写入新文件，file_ 指针指向新文件
 void LogFile::rollFile()
 {
     time_t now = 0;
+    // 会把获取文件名称的时间返回到 now
     string filename = getLogFileName(basename_, &now);
+    // 注意，这里先除 kPollPerSeconds_【一天的秒数】，后乘 kRollPerSeconds_ 表示
+    // 对齐至 kRollPerSeconds_ 整数倍，也就是时间调整到当天零点
     time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;
 
     if (now > lastRoll_)
     {
         lastRoll_ = now;
         lastFlush_ = now;
+
         startOfPeriod_ = start;
+        // 产生了一个新的日志文件 new File(filename)
+        // p.reset(q) //q为智能指针要指向的新对象
+        // 会令智能指针p中存放指针q，即p指向q的空间，而且会释放原来的空间
         file_.reset(new File(filename));
     }
 }
 
+// logfile_test.20130411-115604.popo.7743.log
 string LogFile::getLogFileName(const string& basename, time_t* now)
 {
     string filename;
+    // 保留这么大的空间
     filename.reserve(basename.size() + 64);
     filename = basename;
 

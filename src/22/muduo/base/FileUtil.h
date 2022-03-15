@@ -47,6 +47,7 @@ namespace muduo
         };
 
         // read the file content, returns errno if error happens.
+        // 从 filename 中读取数据，保存到 content 中
         template<typename String>
         int readFile(StringPiece filename,
                     int maxSize,
