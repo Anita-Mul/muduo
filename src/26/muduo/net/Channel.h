@@ -77,6 +77,7 @@ namespace muduo
                 void set_index(int idx) { index_ = idx; }
 
                 // for debug
+                // 把这个事件转成字符串，以便调试
                 string reventsToString() const;
 
                 void doNotLogHup() { logHup_ = false; }

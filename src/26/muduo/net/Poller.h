@@ -51,7 +51,7 @@ namespace muduo
 
                 void assertInLoopThread()
                 {
-                    ownerLoop_->assertInLoopThread();
+                    ownerLoo p_->assertInLoopThread();
                 }
 
             private:
