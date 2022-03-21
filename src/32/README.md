@@ -1,13 +1,9 @@
-#include <muduo/net/Acceptor.h>
-#include <muduo/net/EventLoop.h>
-#include <muduo/net/InetAddress.h>
-#include <muduo/net/SocketsOps.h>
+## Acceptor
+ - Acceptor用于accept(2)接受TCP连接
+ - Acceptor的数据成员包括Socket、Channel，Acceptor的socket是listening socket（即server socket）。Channel用于观察此socket的readable事件，并回调Accptor::handleRead()，后者调用accept(2)来接受新连接，并回调用户callback。
 
-#include <stdio.h>
-
-using namespace muduo;
-using namespace muduo::net;
-
+## Acceptor 示例
+```c++
 void newConnection(int sockfd, const InetAddress& peerAddr)
 {
   printf("newConnection(): accepted a new connection from %s\n",
@@ -29,4 +25,4 @@ int main()
 
   loop.loop();
 }
-
+```
