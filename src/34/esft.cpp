@@ -4,16 +4,16 @@
 
 class Y: public boost::enable_shared_from_this<Y>
 {
-public:
-	boost::shared_ptr<Y> f()
-	{
-		return shared_from_this();
-	}
+	public:
+		boost::shared_ptr<Y> f()
+		{
+			return shared_from_this();
+		}
 
-	Y* f2()
-	{
-		return this;
-	}
+		Y* f2()
+		{
+			return this;
+		}
 };
 
 int main()
