@@ -30,7 +30,7 @@ class LogFile::File : boost::noncopyable
   {
     size_t n = write(logline, len);
     size_t remain = len - n;
-	// remain>0è¡¨ç¤ºæ²¡å†™å®Œï¼Œéœ€è¦ç»§ç»­å†™ç›´åˆ°å†™å®Œ
+	// remain>0±íÊ¾Ã»Ð´Íê£¬ÐèÒª¼ÌÐøÐ´Ö±µ½Ð´Íê
     while (remain > 0)
     {
       size_t x = write(logline + n, remain);
@@ -153,8 +153,8 @@ void LogFile::rollFile()
 {
   time_t now = 0;
   string filename = getLogFileName(basename_, &now);
-  // æ³¨æ„ï¼Œè¿™é‡Œå…ˆé™¤kRollPerSeconds_ åŽä¹˜kRollPerSeconds_è¡¨ç¤º
-  // å¯¹é½è‡³kRollPerSeconds_æ•´æ•°å€ï¼Œä¹Ÿå°±æ˜¯æ—¶é—´è°ƒæ•´åˆ°å½“å¤©é›¶ç‚¹ã€‚
+  // ×¢Òâ£¬ÕâÀïÏÈ³ýkRollPerSeconds_ ºó³ËkRollPerSeconds_±íÊ¾
+  // ¶ÔÆëÖÁkRollPerSeconds_ÕûÊý±¶£¬Ò²¾ÍÊÇÊ±¼äµ÷Õûµ½µ±ÌìÁãµã¡£
   time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;
 
   if (now > lastRoll_)

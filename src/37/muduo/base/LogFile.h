@@ -28,16 +28,16 @@ class LogFile : boost::noncopyable
   static string getLogFileName(const string& basename, time_t* now);
   void rollFile();
 
-  const string basename_;		// æ—¥å¿—æ–‡ä»¶basename
-  const size_t rollSize_;		// æ—¥å¿—æ–‡ä»¶è¾¾åˆ°rolSize_æ¢ä¸€ä¸ªæ–°æ–‡ä»¶
-  const int flushInterval_;		// æ—¥å¿—å†™å…¥é—´éš”æ—¶é—´
+  const string basename_;		// ÈÕÖ¾ÎÄ¼şbasename
+  const size_t rollSize_;		// ÈÕÖ¾ÎÄ¼ş´ïµ½rolSize_»»Ò»¸öĞÂÎÄ¼ş
+  const int flushInterval_;		// ÈÕÖ¾Ğ´Èë¼ä¸ôÊ±¼ä
 
   int count_;
 
   boost::scoped_ptr<MutexLock> mutex_;
-  time_t startOfPeriod_;	// å¼€å§‹è®°å½•æ—¥å¿—æ—¶é—´ï¼ˆè°ƒæ•´è‡³é›¶ç‚¹çš„æ—¶é—´ï¼‰
-  time_t lastRoll_;			// ä¸Šä¸€æ¬¡æ»šåŠ¨æ—¥å¿—æ–‡ä»¶æ—¶é—´
-  time_t lastFlush_;		// ä¸Šä¸€æ¬¡æ—¥å¿—å†™å…¥æ–‡ä»¶æ—¶é—´
+  time_t startOfPeriod_;	// ¿ªÊ¼¼ÇÂ¼ÈÕÖ¾Ê±¼ä£¨µ÷ÕûÖÁÁãµãµÄÊ±¼ä£©
+  time_t lastRoll_;			// ÉÏÒ»´Î¹ö¶¯ÈÕÖ¾ÎÄ¼şÊ±¼ä
+  time_t lastFlush_;		// ÉÏÒ»´ÎÈÕÖ¾Ğ´ÈëÎÄ¼şÊ±¼ä
   class File;
   boost::scoped_ptr<File> file_;
 

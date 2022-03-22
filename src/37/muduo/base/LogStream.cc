@@ -12,8 +12,8 @@
 using namespace muduo;
 using namespace muduo::detail;
 
-// å¿½ç•¥-Wtype-limits
-// å…³äºdiagnosticæ›´å¤šä¿¡æ¯ï¼Œå¯ä»¥æŸ¥çœ‹http://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html
+// ºöÂÔ-Wtype-limits
+// ¹ØÓÚdiagnostic¸ü¶àĞÅÏ¢£¬¿ÉÒÔ²é¿´http://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html
 #pragma GCC diagnostic ignored "-Wtype-limits"
 //#pragma GCC diagnostic error "-Wtype-limits"
 namespace muduo
@@ -52,7 +52,7 @@ size_t convert(char buf[], T value)
   return p - buf;
 }
 
-// uintptr_tå¯¹äº32å¹³å°æ¥è¯´å°±æ˜¯unsigned int, å¯¹äº64ä½å¹³å°æ¥è¯´unsigned long int
+// uintptr_t¶ÔÓÚ32Æ½Ì¨À´Ëµ¾ÍÊÇunsigned int, ¶ÔÓÚ64Î»Æ½Ì¨À´Ëµunsigned long int
 size_t convertHex(char buf[], uintptr_t value)
 {
   uintptr_t i = value;
@@ -188,7 +188,7 @@ LogStream& LogStream::operator<<(double v)
 template<typename T>
 Fmt::Fmt(const char* fmt, T val)
 {
-  // æ–­è¨€Tæ˜¯ç®—æœ¯ç±»å‹
+  // ¶ÏÑÔTÊÇËãÊõÀàĞÍ
   BOOST_STATIC_ASSERT(boost::is_arithmetic<T>::value == true);
 
   length_ = snprintf(buf_, sizeof buf_, fmt, val);
