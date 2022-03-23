@@ -1,2 +1,0 @@
-add_executable(threadpool_test ThreadPool_test.cc)
-target_link_libraries(threadpool_test muduo_base)
