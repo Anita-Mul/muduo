@@ -15,13 +15,15 @@ AtomicInt64 Timer::s_numCreated_;
 
 void Timer::restart(Timestamp now)
 {
-  if (repeat_)
-  {
-    // 重新计算下一个超时时刻
-    expiration_ = addTime(now, interval_);
-  }
-  else
-  {
-    expiration_ = Timestamp::invalid();
-  }
+    // 如果是重复的定时器
+    if (repeat_)
+    {
+        // 重新计算下一个超时时刻
+        expiration_ = addTime(now, interval_);
+    }
+    else
+    {
+        // 下一次的超时时刻等于一个非法的时间
+        expiration_ = Timestamp::invalid();
+    }
 }

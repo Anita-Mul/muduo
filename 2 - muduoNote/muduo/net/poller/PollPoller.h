@@ -20,33 +20,32 @@ struct pollfd;
 
 namespace muduo
 {
-namespace net
-{
+    namespace net
+    {
+        ///
+        /// IO Multiplexing with poll(2).
+        ///
+        class PollPoller : public Poller
+        {
+            public:
+                PollPoller(EventLoop* loop);
+                virtual ~PollPoller();
 
-///
-/// IO Multiplexing with poll(2).
-///
-class PollPoller : public Poller
-{
- public:
+                virtual Timestamp poll(int timeoutMs, ChannelList* activeChannels);
+                virtual void updateChannel(Channel* channel);
+                virtual void removeChannel(Channel* channel);
 
-  PollPoller(EventLoop* loop);
-  virtual ~PollPoller();
+            private:
+                void fillActiveChannels(int numEvents,
+                                        ChannelList* activeChannels) const;
 
-  virtual Timestamp poll(int timeoutMs, ChannelList* activeChannels);
-  virtual void updateChannel(Channel* channel);
-  virtual void removeChannel(Channel* channel);
-
- private:
-  void fillActiveChannels(int numEvents,
-                          ChannelList* activeChannels) const;
-
-  typedef std::vector<struct pollfd> PollFdList;
-  typedef std::map<int, Channel*> ChannelMap;	// key是文件描述符，value是Channel*
-  PollFdList pollfds_;
-  ChannelMap channels_;
-};
-
-}
+                typedef std::vector<struct pollfd> PollFdList;
+                // 文件描述符和它所对应的 Channel
+                typedef std::map<int, Channel*> ChannelMap;	// key是文件描述符，value是Channel*
+                // 需要监听的 pollfd 数组
+                PollFdList pollfds_;
+                ChannelMap channels_;
+        };
+    }
 }
 #endif  // MUDUO_NET_POLLER_POLLPOLLER_H

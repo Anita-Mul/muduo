@@ -19,42 +19,40 @@
 
 namespace muduo
 {
-namespace net
-{
+    namespace net
+    {
+        class EventLoop;
+        class InetAddress;
 
-class EventLoop;
-class InetAddress;
+        ///
+        /// Acceptor of incoming TCP connections.
+        ///
+        class Acceptor : boost::noncopyable
+        {
+            public:
+                typedef boost::function<void (int sockfd,
+                                              const InetAddress&)> NewConnectionCallback;
 
-///
-/// Acceptor of incoming TCP connections.
-///
-class Acceptor : boost::noncopyable
-{
- public:
-  typedef boost::function<void (int sockfd,
-                                const InetAddress&)> NewConnectionCallback;
+                Acceptor(EventLoop* loop, const InetAddress& listenAddr);
+                ~Acceptor();
 
-  Acceptor(EventLoop* loop, const InetAddress& listenAddr);
-  ~Acceptor();
+                void setNewConnectionCallback(const NewConnectionCallback& cb)
+                { newConnectionCallback_ = cb; }
 
-  void setNewConnectionCallback(const NewConnectionCallback& cb)
-  { newConnectionCallback_ = cb; }
+                bool listenning() const { return listenning_; }
+                void listen();
 
-  bool listenning() const { return listenning_; }
-  void listen();
+            private:
+                void handleRead();
 
- private:
-  void handleRead();
-
-  EventLoop* loop_;
-  Socket acceptSocket_;
-  Channel acceptChannel_;
-  NewConnectionCallback newConnectionCallback_;
-  bool listenning_;
-  int idleFd_;
-};
-
-}
+                EventLoop* loop_;
+                Socket acceptSocket_;     // 监听套接字
+                Channel acceptChannel_;   // 监听的通道
+                NewConnectionCallback newConnectionCallback_;
+                bool listenning_;
+                int idleFd_;
+        };
+    }
 }
 
 #endif  // MUDUO_NET_ACCEPTOR_H

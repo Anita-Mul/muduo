@@ -1,2 +1,0 @@
-add_executable(reactor_test07 Reactor_test07.cc)
-target_link_libraries(reactor_test07 muduo_net)

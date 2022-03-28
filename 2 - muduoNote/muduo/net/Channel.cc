@@ -18,6 +18,7 @@ using namespace muduo;
 using namespace muduo::net;
 
 const int Channel::kNoneEvent = 0;
+// POLLPRI 有紧迫数据可读
 const int Channel::kReadEvent = POLLIN | POLLPRI;
 const int Channel::kWriteEvent = POLLOUT;
 
@@ -35,88 +36,99 @@ Channel::Channel(EventLoop* loop, int fd__)
 
 Channel::~Channel()
 {
-  assert(!eventHandling_);
+    assert(!eventHandling_);
 }
 
 void Channel::tie(const boost::shared_ptr<void>& obj)
 {
-  tie_ = obj;
-  tied_ = true;
+    tie_ = obj;
+    tied_ = true;
 }
 
 void Channel::update()
 {
-  loop_->updateChannel(this);
+    loop_->updateChannel(this);
 }
 
 // 调用这个函数之前确保调用disableAll
 void Channel::remove()
 {
-  assert(isNoneEvent());
-  loop_->removeChannel(this);
+    assert(isNoneEvent());
+    loop_->removeChannel(this);
 }
 
 void Channel::handleEvent(Timestamp receiveTime)
 {
-  boost::shared_ptr<void> guard;
-  if (tied_)
-  {
-    guard = tie_.lock();
-    if (guard)
+    boost::shared_ptr<void> guard;
+
+    if (tied_)
     {
-      LOG_TRACE << "[6] usecount=" << guard.use_count();
-      handleEventWithGuard(receiveTime);
-	  LOG_TRACE << "[12] usecount=" << guard.use_count();
+        guard = tie_.lock();
+        if (guard)
+        {
+            LOG_TRACE << "[6] usecount=" << guard.use_count();
+              handleEventWithGuard(receiveTime);
+            LOG_TRACE << "[12] usecount=" << guard.use_count();
+        }
     }
-  }
-  else
-  {
-    handleEventWithGuard(receiveTime);
-  }
+    else
+    {
+        handleEventWithGuard(receiveTime);
+    }
 }
 
 void Channel::handleEventWithGuard(Timestamp receiveTime)
 {
-  eventHandling_ = true;
-  /*
-  if (revents_ & POLLHUP)
-  {
-	  LOG_TRACE << "1111111111111111";
-  }
-  if (revents_ & POLLIN)
-  {
-	  LOG_TRACE << "2222222222222222";
-  }
-  */
-  if ((revents_ & POLLHUP) && !(revents_ & POLLIN))
-  {
-    if (logHup_)
+    eventHandling_ = true;
+
+    /*
+    if (revents_ & POLLHUP)
     {
-      LOG_WARN << "Channel::handle_event() POLLHUP";
+      LOG_TRACE << "1111111111111111";
     }
-    if (closeCallback_) closeCallback_();
-  }
+    if (revents_ & POLLIN)
+    {
+      LOG_TRACE << "2222222222222222";
+    }
+    */
 
-  if (revents_ & POLLNVAL)
-  {
-    LOG_WARN << "Channel::handle_event() POLLNVAL";
-  }
+    // POLLHUP 对方描述符挂起
+    if ((revents_ & POLLHUP) && !(revents_ & POLLIN))
+    {
+        if (logHup_)
+        {
+            LOG_WARN << "Channel::handle_event() POLLHUP";
+        }
 
-  if (revents_ & (POLLERR | POLLNVAL))
-  {
-    if (errorCallback_) errorCallback_();
-  }
-  if (revents_ & (POLLIN | POLLPRI | POLLRDHUP))
-  {
-    if (readCallback_) readCallback_(receiveTime);
-  }
-  if (revents_ & POLLOUT)
-  {
-    if (writeCallback_) writeCallback_();
-  }
-  eventHandling_ = false;
+        if (closeCallback_) closeCallback_();
+    }
+
+    // fd not open (output only)
+    if (revents_ & POLLNVAL)
+    {
+        LOG_WARN << "Channel::handle_event() POLLNVAL";
+    }
+
+    // POLLRDHUP 对等方关闭连接
+    if (revents_ & (POLLERR | POLLNVAL))
+    {
+        if (errorCallback_) errorCallback_();
+    }
+
+    if (revents_ & (POLLIN | POLLPRI | POLLRDHUP))
+    {
+        if (readCallback_) readCallback_(receiveTime);
+    }
+
+    if (revents_ & POLLOUT)
+    {
+        if (writeCallback_) writeCallback_();
+    }
+
+    eventHandling_ = false;
 }
 
+// 用来调试的
 string Channel::reventsToString() const
 {
   std::ostringstream oss;

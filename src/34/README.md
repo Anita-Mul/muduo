@@ -1,3 +1,0 @@
- - TcpConnection生存期管理
- - 当连接到来，创建一个 TcpConnection 对象，立刻用 shared_ptr来管理，引用计数为1，在 Channel 中维护一个 weak_ptr(tie_)，将这个 shared_ptr 对象赋值给 tie_，引用计数仍为1
- - 当连接关闭，在 handleEvent，将 tie_ 提升，得到一个 shared_ptr 对象，引用计数就变成了 2

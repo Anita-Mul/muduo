@@ -44,6 +44,13 @@ int main()
   EventLoop loop;
   g_loop = &loop;
 
+  // runAfter 实现了跨线程调用
+  // runAfter  ----->   timerQueue_->addTimer
+  // 在 addTimer 中有 
+  /*
+    loop_->runInLoop(
+      boost::bind(&TimerQueue::addTimerInLoop, this, timer));
+  */
   loop.runAfter(2, run1);
   loop.loop();
   printf("main(): pid = %d, flag = %d\n", getpid(), g_flag);
