@@ -195,7 +195,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
       LOG_TRACE << "I am going to write more data";
       size_t oldLen = outputBuffer_.readableBytes();
 
-      // 如果超过highWaterMark_（高水位标），回调highWaterMarkCallback_
+      // 如果超过highWaterMark_（高水位标，缓冲区的极限），回调highWaterMarkCallback_
       if (oldLen + remaining >= highWaterMark_     // 构造函数中设置成了 64M
           && oldLen < highWaterMark_
           && highWaterMarkCallback_)
@@ -213,12 +213,15 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
 }
 
 // 先清空缓冲区的数据，然后再关闭
+// 服务器端主动断开与客户端的连接
+// 这意味着客户端 read 返回为 0
 void TcpConnection::shutdown()
 {
     // FIXME: use compare and swap
     if (state_ == kConnected)
     {
         // 更改状态为正在关闭
+        // 如果缓冲区中还没有数据发送完，只是将连接状态更改为 kDisconnecting，并没有关闭连接
         setState(kDisconnecting);                   
         // FIXME: shared_from_this()?
         loop_->runInLoop(boost::bind(&TcpConnection::shutdownInLoop, this));

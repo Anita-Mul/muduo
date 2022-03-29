@@ -93,19 +93,22 @@ namespace muduo
 
                 typedef std::map<string, TcpConnectionPtr> ConnectionMap;
 
-                EventLoop* loop_;                                       // the acceptor loop
-                const string hostport_;		                              // 服务端口
+                EventLoop* loop_;                                           // the acceptor loop
+                const string hostport_;		                                // 服务端口
                 const string name_;			                                // 服务名
-                boost::scoped_ptr<Acceptor> acceptor_;                  // avoid revealing Acceptor
+                
+                boost::scoped_ptr<Acceptor> acceptor_;                      // avoid revealing Acceptor
                 boost::scoped_ptr<EventLoopThreadPool> threadPool_;
+                
                 ConnectionCallback connectionCallback_;
                 MessageCallback messageCallback_;
                 WriteCompleteCallback writeCompleteCallback_;		        // 数据发送完毕，会回调此函数
-                ThreadInitCallback threadInitCallback_;	                // IO线程池中的线程在进入事件循环前，会回调用此函数
+                ThreadInitCallback threadInitCallback_;	                    // IO线程池中的线程在进入事件循环前，会回调用此函数
+                
                 bool started_;
                 // always in loop thread
-                int nextConnId_;				                                // 下一个连接ID
-                ConnectionMap connections_;	                            // 连接列表
+                int nextConnId_;				                            // 下一个连接ID
+                ConnectionMap connections_;	                                // 连接列表
         };
     }
 }

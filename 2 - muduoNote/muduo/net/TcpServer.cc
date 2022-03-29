@@ -36,6 +36,7 @@ TcpServer::TcpServer(EventLoop* loop,
 {
     // Acceptor::handleRead函数中会回调用TcpServer::newConnection
     // _1对应的是socket文件描述符，_2对应的是对等方的地址(InetAddress)
+    // 当接受到一个连接的时候，调用 TcpServer::newConnection                                         
     acceptor_->setNewConnectionCallback(
         boost::bind(&TcpServer::newConnection, this, _1, _2));
 }
@@ -78,6 +79,7 @@ void TcpServer::start()
     if (!acceptor_->listenning())         // 返回 listenning_ 的值
     {
         // get_pointer返回原生指针
+        // 让 accepter 开始监听套接字
         loop_->runInLoop(
             boost::bind(&Acceptor::listen, get_pointer(acceptor_)));
     }
@@ -114,10 +116,10 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
     LOG_TRACE << "[1] usecount=" << conn.use_count();
     connections_[connName] = conn;
     LOG_TRACE << "[2] usecount=" << conn.use_count();
+
     conn->setConnectionCallback(connectionCallback_);
     conn->setMessageCallback(messageCallback_);
     conn->setWriteCompleteCallback(writeCompleteCallback_);
-
     conn->setCloseCallback(
         boost::bind(&TcpServer::removeConnection, this, _1));
 
@@ -158,7 +160,7 @@ void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn)
 
 
     LOG_TRACE << "[8] usecount=" << conn.use_count();
-    size_t n = connections_.erase(conn->name());
+    size_t n = connections_.erase(conn->name());                     // 从 connections 中移除
     LOG_TRACE << "[9] usecount=" << conn.use_count();
 
     (void)n;

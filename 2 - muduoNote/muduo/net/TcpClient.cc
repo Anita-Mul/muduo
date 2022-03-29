@@ -34,23 +34,21 @@ using namespace muduo::net;
 
 namespace muduo
 {
-namespace net
-{
-namespace detail
-{
+    namespace net
+    {
+        namespace detail
+        {
+            void removeConnection(EventLoop* loop, const TcpConnectionPtr& conn)
+            {
+                loop->queueInLoop(boost::bind(&TcpConnection::connectDestroyed, conn));
+            }
 
-void removeConnection(EventLoop* loop, const TcpConnectionPtr& conn)
-{
-  loop->queueInLoop(boost::bind(&TcpConnection::connectDestroyed, conn));
-}
-
-void removeConnector(const ConnectorPtr& connector)
-{
-  //connector->
-}
-
-}
-}
+            void removeConnector(const ConnectorPtr& connector)
+            {
+                //connector->
+            }
+        }
+    }
 }
 
 TcpClient::TcpClient(EventLoop* loop,
@@ -65,39 +63,40 @@ TcpClient::TcpClient(EventLoop* loop,
     connect_(true),
     nextConnId_(1)
 {
-  // 设置连接成功回调函数
-  connector_->setNewConnectionCallback(
-      boost::bind(&TcpClient::newConnection, this, _1));
-  // FIXME setConnectFailedCallback
-  LOG_INFO << "TcpClient::TcpClient[" << name_
-           << "] - connector " << get_pointer(connector_);
+    // 设置连接成功回调函数
+    connector_->setNewConnectionCallback(
+        boost::bind(&TcpClient::newConnection, this, _1));
+    // FIXME setConnectFailedCallback
+    LOG_INFO << "TcpClient::TcpClient[" << name_
+            << "] - connector " << get_pointer(connector_);
 }
 
 TcpClient::~TcpClient()
 {
-  LOG_INFO << "TcpClient::~TcpClient[" << name_
-           << "] - connector " << get_pointer(connector_);
-  TcpConnectionPtr conn;
-  {
-    MutexLockGuard lock(mutex_);
-    conn = connection_;
-  }
-  if (conn)
-  {
-    // FIXME: not 100% safe, if we are in different thread
+    LOG_INFO << "TcpClient::~TcpClient[" << name_
+            << "] - connector " << get_pointer(connector_);
+    TcpConnectionPtr conn;
+    {
+        MutexLockGuard lock(mutex_);
+        conn = connection_;
+    }
 
-	// 重新设置TcpConnection中的closeCallback_为detail::removeConnection
-    CloseCallback cb = boost::bind(&detail::removeConnection, loop_, _1);
-    loop_->runInLoop(
-        boost::bind(&TcpConnection::setCloseCallback, conn, cb));
-  }
-  else
-  {
-    // 这种情况，说明connector处于未连接状态，将connector_停止
-    connector_->stop();
-    // FIXME: HACK
-    loop_->runAfter(1, boost::bind(&detail::removeConnector, connector_));
-  }
+    if (conn)
+    {
+        // FIXME: not 100% safe, if we are in different thread
+
+        // 重新设置TcpConnection中的closeCallback_为detail::removeConnection
+        CloseCallback cb = boost::bind(&detail::removeConnection, loop_, _1);
+        loop_->runInLoop(
+            boost::bind(&TcpConnection::setCloseCallback, conn, cb));
+    }
+    else
+    {
+        // 这种情况，说明connector处于未连接状态，将connector_停止
+        connector_->stop();
+        // FIXME: HACK
+        loop_->runAfter(1, boost::bind(&detail::removeConnector, connector_));
+    }
 }
 
 void TcpClient::connect()
@@ -172,6 +171,7 @@ void TcpClient::removeConnection(const TcpConnectionPtr& conn)
   }
 
   loop_->queueInLoop(boost::bind(&TcpConnection::connectDestroyed, conn));
+  
   if (retry_ && connect_)
   {
     LOG_INFO << "TcpClient::connect[" << name_ << "] - Reconnecting to "

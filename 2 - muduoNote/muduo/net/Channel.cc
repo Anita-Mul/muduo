@@ -97,6 +97,7 @@ void Channel::handleEventWithGuard(Timestamp receiveTime)
     
     // 当事件为挂起并没有可读事件时
     // POLLHUP 对方描述符挂起
+    // 当客户端调用 close，服务器端接收到 POLLHUP 和 POLLIN
     if ((revents_ & POLLHUP) && !(revents_ & POLLIN))
     {
         if (logHup_)
