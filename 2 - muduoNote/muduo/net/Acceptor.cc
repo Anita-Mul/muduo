@@ -24,16 +24,16 @@ using namespace muduo::net;
 
 Acceptor::Acceptor(EventLoop* loop, const InetAddress& listenAddr)
   : loop_(loop),
-    acceptSocket_(sockets::createNonblockingOrDie()),
+    acceptSocket_(sockets::createNonblockingOrDie()),       // 创建监听套接字
     acceptChannel_(loop, acceptSocket_.fd()),
     listenning_(false),
-    idleFd_(::open("/dev/null", O_RDONLY | O_CLOEXEC))
+    idleFd_(::open("/dev/null", O_RDONLY | O_CLOEXEC))      // 预先准备一个空闲文件描述符
 {
     assert(idleFd_ >= 0);
     acceptSocket_.setReuseAddr(true);
     acceptSocket_.bindAddress(listenAddr);
     acceptChannel_.setReadCallback(
-        boost::bind(&Acceptor::handleRead, this));
+        boost::bind(&Acceptor::handleRead, this));          // 设置Channel的fd的读回调函数
 }
 
 Acceptor::~Acceptor()
@@ -43,6 +43,7 @@ Acceptor::~Acceptor()
     ::close(idleFd_);
 }
 
+// Acceptor是在listen中开始关注可读事件
 void Acceptor::listen()
 {
     loop_->assertInLoopThread();
@@ -63,14 +64,14 @@ void Acceptor::handleRead()
     {
         // string hostport = peerAddr.toIpPort();
         // LOG_TRACE << "Accepts of " << hostport;
-        if (newConnectionCallback_)
+        if (newConnectionCallback_)                         // 如果设置了新连接回调函数
         {
             // 调用回调函数
-            newConnectionCallback_(connfd, peerAddr);
+            newConnectionCallback_(connfd, peerAddr);       // 那么就执行它
         }
         else
         {
-            sockets::close(connfd);
+            sockets::close(connfd);                         // 否则就关闭，sockets是全局函数
         }
     }
     else
@@ -80,9 +81,13 @@ void Acceptor::handleRead()
       // By Marc Lehmann, author of livev.
         if (errno == EMFILE)        // 文件描述符太多了
         {
-            ::close(idleFd_);
+            // 先关闭空闲文件描述符，让它能够接收。否则由于采用电平触发，不接收会一直触发。
+            ::close(idleFd_);   
+            // 那就腾出一个文件描述符，用来accept
             idleFd_ = ::accept(acceptSocket_.fd(), NULL, NULL);
+            // accept之后再关闭
             ::close(idleFd_);
+            // 然后再打开成默认方式
             idleFd_ = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
         }
     }

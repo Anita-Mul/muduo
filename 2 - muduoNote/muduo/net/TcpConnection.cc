@@ -44,11 +44,11 @@ TcpConnection::TcpConnection(EventLoop* loop,
   : loop_(CHECK_NOTNULL(loop)),
     name_(nameArg),
     state_(kConnecting),
-    socket_(new Socket(sockfd)),
-    channel_(new Channel(loop, sockfd)),
+    socket_(new Socket(sockfd)),                // new了一个新的socket，对应这条连接
+    channel_(new Channel(loop, sockfd)),        // new了一个新的Channel
     localAddr_(localAddr),
     peerAddr_(peerAddr),
-    highWaterMark_(64*1024*1024)
+    highWaterMark_(64*1024*1024)                // 高水位为64M
 {
     // 通道可读事件到来的时候，回调TcpConnection::handleRead，_1是事件发生时间
     channel_->setReadCallback(
@@ -151,6 +151,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
     size_t remaining = len;
     bool error = false;
 
+    // 如果状态是断开连接
     if (state_ == kDisconnected)
     {
         LOG_WARN << "disconnected, give up writing";
@@ -172,7 +173,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
                 loop_->queueInLoop(boost::bind(writeCompleteCallback_, shared_from_this()));
             }
         }
-        else // nwrote < 0
+        else // nwrote < 0    发生错误
         {
             nwrote = 0;
             if (errno != EWOULDBLOCK)
@@ -195,7 +196,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
       size_t oldLen = outputBuffer_.readableBytes();
 
       // 如果超过highWaterMark_（高水位标），回调highWaterMarkCallback_
-      if (oldLen + remaining >= highWaterMark_
+      if (oldLen + remaining >= highWaterMark_     // 构造函数中设置成了 64M
           && oldLen < highWaterMark_
           && highWaterMarkCallback_)
       {
@@ -217,7 +218,8 @@ void TcpConnection::shutdown()
     // FIXME: use compare and swap
     if (state_ == kConnected)
     {
-        setState(kDisconnecting);
+        // 更改状态为正在关闭
+        setState(kDisconnecting);                   
         // FIXME: shared_from_this()?
         loop_->runInLoop(boost::bind(&TcpConnection::shutdownInLoop, this));
     }
@@ -230,6 +232,7 @@ void TcpConnection::shutdownInLoop()
     if (!channel_->isWriting())
     {
         // we are not writing
+        // 只关闭写的这一半
         socket_->shutdownWrite();
     }
 }
@@ -239,12 +242,15 @@ void TcpConnection::setTcpNoDelay(bool on)
     socket_->setTcpNoDelay(on);
 }
 
+// 设置已连接状态
 void TcpConnection::connectEstablished()
 {
     loop_->assertInLoopThread();
     assert(state_ == kConnecting);
+
     setState(kConnected);
     LOG_TRACE << "[3] usecount=" << shared_from_this().use_count();
+
     channel_->tie(shared_from_this());
     channel_->enableReading();	// TcpConnection所对应的通道加入到Poller关注
 
@@ -252,6 +258,7 @@ void TcpConnection::connectEstablished()
     LOG_TRACE << "[4] usecount=" << shared_from_this().use_count();
 }
 
+// 设置已关闭连接状态
 void TcpConnection::connectDestroyed()
 {
     loop_->assertInLoopThread();
@@ -266,6 +273,7 @@ void TcpConnection::connectDestroyed()
     
     channel_->remove();
 }
+
 
 void TcpConnection::handleRead(Timestamp receiveTime)
 {
@@ -311,10 +319,13 @@ void TcpConnection::handleRead(Timestamp receiveTime)
     */
     loop_->assertInLoopThread();
     int savedErrno = 0;
+    // 从文件描述符 fd 中读取数据，存储到 inputBuffer 中，LT 触发模式
     ssize_t n = inputBuffer_.readFd(channel_->fd(), &savedErrno);
 
     if (n > 0)
     {
+        // 喊客户代码来拿数据了
+        // 消息到来的回调函数
         messageCallback_(shared_from_this(), &inputBuffer_, receiveTime);
     }
     else if (n == 0)
@@ -330,28 +341,33 @@ void TcpConnection::handleRead(Timestamp receiveTime)
 }
 
 // 内核发送缓冲区有空间了，回调该函数
+// 当 socket 可写，调用这个函数
 void TcpConnection::handleWrite()
 {
     loop_->assertInLoopThread();
 
     if (channel_->isWriting())
     {
+        // 用户将要写的内容写到 outputBuffer
+        // 向socket中写入 outputBuffer_.readableBytes个字节的buffer内的内容
         ssize_t n = sockets::write(channel_->fd(),
-                                  outputBuffer_.peek(),
-                                  outputBuffer_.readableBytes());
+                                  outputBuffer_.peek(),                 // 返回读的指针
+                                  outputBuffer_.readableBytes());       // 可读的字节数
         if (n > 0)
         {
-            outputBuffer_.retrieve(n);
+            outputBuffer_.retrieve(n);                  // buffer释放n个字节的空间，也不能说释放，buffer是通过移动指针来操作区间的
 
-            if (outputBuffer_.readableBytes() == 0)	 // 发送缓冲区已清空
+            if (outputBuffer_.readableBytes() == 0)	    // 发送缓冲区已清空，没有数据了
             {
-              channel_->disableWriting();		         // 停止关注POLLOUT事件，以免出现busy loop
-              if (writeCompleteCallback_)		         // 回调writeCompleteCallback_
+              channel_->disableWriting();		        // 停止关注POLLOUT事件，以免出现busy loop
+                                                        // 因为目的就是关注 POLLOUT 事件的目的就是将 buffer 中的数据全写入缓冲区，既然全写入了，就不用关注了
+              if (writeCompleteCallback_)		        // 回调writeCompleteCallback_
               {
                   // 应用层发送缓冲区被清空，就回调用writeCompleteCallback_
                   loop_->queueInLoop(boost::bind(writeCompleteCallback_, shared_from_this()));
               }
-              if (state_ == kDisconnecting)	        // 发送缓冲区已清空并且连接状态是kDisconnecting, 要关闭连接
+
+              if (state_ == kDisconnecting)	            // 发送缓冲区已清空并且连接状态是kDisconnecting, 要关闭连接
               {
                 shutdownInLoop();		                // 关闭连接
               }
@@ -377,18 +393,21 @@ void TcpConnection::handleWrite()
     }
 }
 
+// 流程是，输出日志，设置状态，关闭通道，通知客户代码关闭连接，最后调用TcpConnection的销毁连接代码
 void TcpConnection::handleClose()
 {
     loop_->assertInLoopThread();
+
     LOG_TRACE << "fd = " << channel_->fd() << " state = " << state_;
     assert(state_ == kConnected || state_ == kDisconnecting);
+
     // we don't close fd, leave it to dtor, so we can find leaks easily.
-    setState(kDisconnected);
+    setState(kDisconnected);            // 设置状态为切断的
     // 关闭这个文件描述符上的所有读写错误事件
     channel_->disableAll();
 
     TcpConnectionPtr guardThis(shared_from_this());
-    connectionCallback_(guardThis);		// 这一行，可以不调用
+    connectionCallback_(guardThis);		//这里跟建立连接时一样，再次调用了这个回调函数，所以在用户代码中，需要进行分情况，看到底时建立连接还是断开连接
     LOG_TRACE << "[7] usecount=" << guardThis.use_count();
     // must be the last line
     closeCallback_(guardThis);	        // 调用TcpServer::removeConnection

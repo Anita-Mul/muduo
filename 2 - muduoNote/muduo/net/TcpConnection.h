@@ -66,28 +66,20 @@ namespace muduo
 
                 void setContext(const boost::any& context)
                 { context_ = context; }
-
                 const boost::any& getContext() const
                 { return context_; }
-
                 boost::any* getMutableContext()
                 { return &context_; }
-
                 void setConnectionCallback(const ConnectionCallback& cb)
                 { connectionCallback_ = cb; }
-
                 void setMessageCallback(const MessageCallback& cb)
                 { messageCallback_ = cb; }
-
                 void setWriteCompleteCallback(const WriteCompleteCallback& cb)
                 { writeCompleteCallback_ = cb; }
-
                 void setHighWaterMarkCallback(const HighWaterMarkCallback& cb, size_t highWaterMark)
                 { highWaterMarkCallback_ = cb; highWaterMark_ = highWaterMark; }
-
                 Buffer* inputBuffer()
                 { return &inputBuffer_; }
-
                 /// Internal use only.
                 void setCloseCallback(const CloseCallback& cb)
                 { closeCallback_ = cb; }
@@ -98,26 +90,32 @@ namespace muduo
                 void connectDestroyed();                                  // should be called only once
 
             private:
+                // 连接状态：已断开连接 正在连接 已连接 正在断开连接
                 enum StateE { kDisconnected, kConnecting, kConnected, kDisconnecting };
+
                 void handleRead(Timestamp receiveTime);
                 void handleWrite();
                 void handleClose();
                 void handleError();
+
                 void sendInLoop(const StringPiece& message);
                 void sendInLoop(const void* message, size_t len);
                 void shutdownInLoop();
+
                 void setState(StateE s) { state_ = s; }
 
                 EventLoop* loop_;			                              // 所属EventLoop
                 string name_;				                              // 连接名
                 StateE state_;                                            // FIXME: use atomic variable
                 // we don't expose those classes to client.
-                boost::scoped_ptr<Socket> socket_;
-                boost::scoped_ptr<Channel> channel_;
-                InetAddress localAddr_;
-                InetAddress peerAddr_;
+                boost::scoped_ptr<Socket> socket_;                        // 这个连接对应的socket
+                boost::scoped_ptr<Channel> channel_;                      // 对应的Channel
+
+                InetAddress localAddr_;                                   // 这里的地址信息
+                InetAddress peerAddr_;                                    // 对面的地址信息
+
                 ConnectionCallback connectionCallback_;
-                MessageCallback messageCallback_;
+                MessageCallback messageCallback_;                         // 在TcoConnection中的handleread函数中被调用
                 WriteCompleteCallback writeCompleteCallback_;		      // 数据发送完毕回调函数，即所有的用户数据都已拷贝到内核缓冲区时回调该函数
                                                                           // outputBuffer_被清空也会回调该函数，可以理解为低水位标回调函数
                 HighWaterMarkCallback highWaterMarkCallback_;	          // 高水位标回调函数

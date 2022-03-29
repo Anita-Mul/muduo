@@ -57,12 +57,14 @@ void Channel::remove()
     loop_->removeChannel(this);
 }
 
+// Timestamp主要用于读事件的回调函数
 void Channel::handleEvent(Timestamp receiveTime)
 {
     boost::shared_ptr<void> guard;
 
     if (tied_)
     {
+        // 提升tie_为shared_ptr，如果提升成功，说明指向一个存在的对象
         guard = tie_.lock();
         if (guard)
         {
@@ -77,6 +79,7 @@ void Channel::handleEvent(Timestamp receiveTime)
     }
 }
 
+// 查看epoll/或者poll返回的具体是什么事件，并根据事件的类型进行相应的处理
 void Channel::handleEventWithGuard(Timestamp receiveTime)
 {
     eventHandling_ = true;
@@ -91,7 +94,8 @@ void Channel::handleEventWithGuard(Timestamp receiveTime)
       LOG_TRACE << "2222222222222222";
     }
     */
-
+    
+    // 当事件为挂起并没有可读事件时
     // POLLHUP 对方描述符挂起
     if ((revents_ & POLLHUP) && !(revents_ & POLLIN))
     {
@@ -104,22 +108,26 @@ void Channel::handleEventWithGuard(Timestamp receiveTime)
     }
 
     // fd not open (output only)
+    // 描述字不是一个打开的文件描述符
     if (revents_ & POLLNVAL)
     {
         LOG_WARN << "Channel::handle_event() POLLNVAL";
     }
 
     // POLLRDHUP 对等方关闭连接
+    // 发生错误或者描述符不可打开
     if (revents_ & (POLLERR | POLLNVAL))
     {
         if (errorCallback_) errorCallback_();
     }
 
+    //关于读的事件
     if (revents_ & (POLLIN | POLLPRI | POLLRDHUP))
     {
         if (readCallback_) readCallback_(receiveTime);
     }
 
+    // 关于写的事件
     if (revents_ & POLLOUT)
     {
         if (writeCallback_) writeCallback_();
@@ -129,6 +137,7 @@ void Channel::handleEventWithGuard(Timestamp receiveTime)
 }
 
 // 用来调试的
+//把事件编写成一个string
 string Channel::reventsToString() const
 {
   std::ostringstream oss;

@@ -44,6 +44,7 @@ namespace muduo
                 ~Channel();
 
                 void handleEvent(Timestamp receiveTime);
+
                 // 一些回调函数的注册
                 void setReadCallback(const ReadEventCallback& cb)
                 { readCallback_ = cb; }
@@ -70,6 +71,7 @@ namespace muduo
                 void enableWriting() { events_ |= kWriteEvent; update(); }
                 void disableWriting() { events_ &= ~kWriteEvent; update(); }
                 void disableAll() { events_ = kNoneEvent; update(); }
+
                 bool isWriting() const { return events_ & kWriteEvent; }
 
                 // for Poller
@@ -81,8 +83,8 @@ namespace muduo
                 string reventsToString() const;
 
                 void doNotLogHup() { logHup_ = false; }
-
                 EventLoop* ownerLoop() { return loop_; }
+                
                 void remove();
 
             private:

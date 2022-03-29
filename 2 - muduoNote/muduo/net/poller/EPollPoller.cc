@@ -69,6 +69,7 @@ Timestamp EPollPoller::poll(int timeoutMs, ChannelList* activeChannels)
     {
         LOG_TRACE << numEvents << " events happended";
         fillActiveChannels(numEvents, activeChannels);
+
         if (implicit_cast<size_t>(numEvents) == events_.size())
         {
             // 扩大为原来的两倍
@@ -114,7 +115,7 @@ void EPollPoller::updateChannel(Channel* channel)
 {
     Poller::assertInLoopThread();
     LOG_TRACE << "fd = " << channel->fd() << " events = " << channel->events();
-    const int index = channel->index();
+    const int index = channel->index();  // kNew  kDeleted  kAdded 这个 Channel 的状态
 
     if (index == kNew || index == kDeleted)
     {

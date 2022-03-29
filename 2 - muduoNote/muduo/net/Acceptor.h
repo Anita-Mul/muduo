@@ -26,6 +26,8 @@ namespace muduo
 
         ///
         /// Acceptor of incoming TCP connections.
+        /// Acceptor用于接受（accept）客户端的连接，通过设置回调函数通知使用者。
+        /// 它只在muduo网络库内部的TcpServer使用，由TcpServer控制它的生命期
         ///
         class Acceptor : boost::noncopyable
         {
@@ -43,15 +45,15 @@ namespace muduo
                 void listen();
 
             private:
-                void handleRead();
+                void handleRead();                              // 可读回调函数
 
                 EventLoop* loop_;
-                Socket acceptSocket_;     // 监听套接字
-                Channel acceptChannel_;   // 监听的通道
-                NewConnectionCallback newConnectionCallback_;
-                bool listenning_;
-                int idleFd_;
-        };
+                Socket acceptSocket_;                           // 监听套接字
+                Channel acceptChannel_;                         // 监听的通道
+                NewConnectionCallback newConnectionCallback_;   // 一旦有新连接发生执行的回调函数
+                bool listenning_;                               // acceptChannel所处的EventLoop是否处于监听状态
+                int idleFd_;                                    // 用来解决文件描述符过多引起电平触发不断触发的问题
+        };  
     }
 }
 

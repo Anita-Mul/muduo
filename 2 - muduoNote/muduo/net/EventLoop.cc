@@ -32,27 +32,30 @@ namespace
 
     int createEventfd()
     {
-        // eventfd是linux 2.6.22后系统提供的一个轻量级的进程间通信的系统调用，eventfd通过一个进程间共享的64位计数器完成进程间通信
+        // eventfd是linux 2.6.22后系统提供的一个轻量级的进程间通信的系统调用
+        // eventfd通过一个进程间共享的64位计数器完成进程间通信
         // https://www.cnblogs.com/kekukele/p/12531824.html
         int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+
         if (evtfd < 0)
         {
             LOG_SYSERR << "Failed in eventfd";
             abort();
         }
+
         return evtfd;
     }
 
     #pragma GCC diagnostic ignored "-Wold-style-cast"
-    class IgnoreSigPipe
-    {
-        public:
-            IgnoreSigPipe()
-            {
-              ::signal(SIGPIPE, SIG_IGN);
-              LOG_TRACE << "Ignore SIGPIPE";
-            }
-    };
+        class IgnoreSigPipe
+        {
+            public:
+                IgnoreSigPipe()
+                {
+                    ::signal(SIGPIPE, SIG_IGN);
+                    LOG_TRACE << "Ignore SIGPIPE";
+                }
+        };
     #pragma GCC diagnostic error "-Wold-style-cast"
 
     IgnoreSigPipe initObj;
@@ -188,6 +191,8 @@ void EventLoop::queueInLoop(const Functor& cb)
     }
 }
 
+
+
 TimerId EventLoop::runAt(const Timestamp& time, const TimerCallback& cb)
 {
     return timerQueue_->addTimer(cb, time, 0.0);
@@ -279,6 +284,7 @@ void EventLoop::handleRead()
 void EventLoop::doPendingFunctors()
 {
     std::vector<Functor> functors;
+
     callingPendingFunctors_ = true;
 
     {

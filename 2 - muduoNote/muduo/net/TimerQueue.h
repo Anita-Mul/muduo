@@ -76,16 +76,16 @@ namespace muduo
 
                 bool insert(Timer* timer);
 
-                EventLoop* loop_;		    // 所属EventLoop
-                const int timerfd_;         // 定时器的文件描述符
-                Channel timerfdChannel_;    // 定时器所属的通道
-                // Timer list sorted by expiration
-                TimerList timers_;	        // timers_是按到期时间排序
+                EventLoop* loop_;		            // 所属EventLoop
+                const int timerfd_;                 // 定时器的文件描述符
+                Channel timerfdChannel_;            // 定时器所属的通道
 
-                // for cancel()
+                // Timer list sorted by expiration
                 // timers_与activeTimers_保存的是相同的数据
                 // timers_是按到期时间排序，activeTimers_是按对象地址排序
+                TimerList timers_;	                
                 ActiveTimerSet activeTimers_;
+
                 bool callingExpiredTimers_;         /* atomic */
                 ActiveTimerSet cancelingTimers_;	// 保存的是被取消的定时器
         };

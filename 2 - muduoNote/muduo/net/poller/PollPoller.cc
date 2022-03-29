@@ -53,7 +53,7 @@ Timestamp PollPoller::poll(int timeoutMs, ChannelList* activeChannels)
 void PollPoller::fillActiveChannels(int numEvents,
                                     ChannelList* activeChannels) const
 {
-    // 遍历 pollfd 数组
+    // 遍历 pollfdList 数组
     for (PollFdList::const_iterator pfd = pollfds_.begin();
         pfd != pollfds_.end() && numEvents > 0; ++pfd)
     {
@@ -82,7 +82,8 @@ void PollPoller::updateChannel(Channel* channel)
     Poller::assertInLoopThread();
     LOG_TRACE << "fd = " << channel->fd() << " events = " << channel->events();
     
-    // used by Poller.表示在poll的事件数组中的序号
+    // 新增
+    // 表示在poll的事件数组中的序号
     if (channel->index() < 0)
     {
         // index < 0说明是一个新的通道
@@ -162,4 +163,5 @@ void PollPoller::removeChannel(Channel* channel)
         pollfds_.pop_back();
     }
 }
+
 

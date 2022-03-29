@@ -25,6 +25,7 @@ namespace muduo
         ///
         /// IO Multiplexing with poll(2).
         ///
+
         class PollPoller : public Poller
         {
             public:
@@ -41,7 +42,8 @@ namespace muduo
 
                 typedef std::vector<struct pollfd> PollFdList;
                 // 文件描述符和它所对应的 Channel
-                typedef std::map<int, Channel*> ChannelMap;	// key是文件描述符，value是Channel*
+                typedef std::map<int, Channel*> ChannelMap;	
+                
                 // 需要监听的 pollfd 数组
                 PollFdList pollfds_;
                 ChannelMap channels_;

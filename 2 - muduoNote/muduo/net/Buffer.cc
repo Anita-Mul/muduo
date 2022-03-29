@@ -31,27 +31,30 @@ ssize_t Buffer::readFd(int fd, int* savedErrno)
     // 节省一次ioctl系统调用（获取有多少可读数据）
     char extrabuf[65536];
     struct iovec vec[2];
+    // 可写的大小
     const size_t writable = writableBytes();
+
     // 第一块缓冲区
     vec[0].iov_base = begin()+writerIndex_;
     vec[0].iov_len = writable;
     // 第二块缓冲区
     vec[1].iov_base = extrabuf;
     vec[1].iov_len = sizeof extrabuf;
-    const ssize_t n = sockets::readv(fd, vec, 2);
+
+    const ssize_t n = sockets::readv(fd, vec, 2);   // 从 fd 里接收数据，放到 vec 中【有两块缓冲区】
     
     if (n < 0)
     {
         *savedErrno = errno;
     }
-    else if (implicit_cast<size_t>(n) <= writable)	//第一块缓冲区足够容纳
+    else if (implicit_cast<size_t>(n) <= writable)	// 第一块缓冲区足够容纳
     {
         writerIndex_ += n;
     }
     else		// 当前缓冲区，不够容纳，因而数据被接收到了第二块缓冲区extrabuf，将其append至buffer
     {
-        writerIndex_ = buffer_.size();
-        append(extrabuf, n - writable);
+        writerIndex_ = buffer_.size();              // 更改写指针的位置为缓冲区的末尾
+        append(extrabuf, n - writable);             // 将缓冲区末尾添加上 extrabuf 里的内容
     }
     // if (n == writable + sizeof extrabuf)
     // {

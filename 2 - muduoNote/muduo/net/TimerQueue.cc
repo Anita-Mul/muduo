@@ -114,14 +114,16 @@ using namespace muduo::net::detail;
 
 TimerQueue::TimerQueue(EventLoop* loop)
   : loop_(loop),
-    timerfd_(createTimerfd()),  // 在 detail 里，创建一个 timerfd，定时器[timerfd]的超时时间就是 timers_ 中第一个 timer 的超时时间[timer->expiration()]
+    // 在 detail 里，创建一个 timerfd
+    // 定时器[timerfd]的超时时间就是 timers_ 
+    // 中第一个 timer 的超时时间[timer->expiration()]
+    timerfd_(createTimerfd()),  
     timerfdChannel_(loop, timerfd_),
     timers_(),
     callingExpiredTimers_(false)
 {
     timerfdChannel_.setReadCallback(
         boost::bind(&TimerQueue::handleRead, this));
-    // we are always reading the timerfd, we disarm it with timerfd_settime.
     timerfdChannel_.enableReading();
 }
 
@@ -177,7 +179,7 @@ void TimerQueue::addTimerInLoop(Timer* timer)
     }
 }
 
-// 取消一个定时器
+// 取消一个定时器，从 set 中移除就可以
 void TimerQueue::cancelInLoop(TimerId timerId)
 {
     loop_->assertInLoopThread();
@@ -324,6 +326,7 @@ bool TimerQueue::insert(Timer* timer)
         // 插入到timers_中  按到期时间排序
         std::pair<TimerList::iterator, bool> result
           = timers_.insert(Entry(when, timer));
+
         assert(result.second); (void)result;
     }
 
@@ -338,4 +341,6 @@ bool TimerQueue::insert(Timer* timer)
     // 返回最早到期时间是否有变化
     return earliestChanged;
 }
+
+
 

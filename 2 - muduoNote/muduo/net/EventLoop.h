@@ -47,8 +47,8 @@ namespace muduo
                 /// Must be called in the same thread as creation of the object.
                 ///
                 /// 事件循环
-                void loop();
 
+                void loop();
                 void quit();
 
                 ///
@@ -90,7 +90,8 @@ namespace muduo
                 void cancel(TimerId timerId);
 
                 // internal usage
-                void wakeup();
+                void wakeup();                              // 唤醒当前的循环
+
                 void updateChannel(Channel* channel);		// 在Poller中添加或者更新通道
                 void removeChannel(Channel* channel);		// 从Poller中移除通道
 
@@ -102,6 +103,7 @@ namespace muduo
                         abortNotInLoopThread();
                     }
                 }
+
                 bool isInLoopThread() const { return threadId_ == CurrentThread::tid(); }
 
                 bool eventHandling() const { return eventHandling_; }
@@ -117,17 +119,19 @@ namespace muduo
 
                 typedef std::vector<Channel*> ChannelList;
                 
+                // 代码执行的状态
                 bool looping_;                                        /* atomic */
                                                                       // 是否处于循环的状态
                 bool quit_;                                           /* atomic */
                 bool eventHandling_;                                  /* atomic */
                 bool callingPendingFunctors_;                         /* atomic */
+                
                 const pid_t threadId_;		                          // 当前对象所属线程ID
                 Timestamp pollReturnTime_;
+                
                 boost::scoped_ptr<Poller> poller_;
                 boost::scoped_ptr<TimerQueue> timerQueue_;
-
-                int wakeupFd_;				                          // 用于eventfd
+                int wakeupFd_;				                          // 用于进程间通信
                 // unlike in TimerQueue, which is an internal class,
                 // we don't expose Channel to client.
                 boost::scoped_ptr<Channel> wakeupChannel_;	          // 该通道将会纳入poller_来管理
