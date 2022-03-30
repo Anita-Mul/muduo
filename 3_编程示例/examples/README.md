@@ -12,3 +12,10 @@
  - reactor（一个IO线程）
  - multiple reactor （多个IO线程）
  - one loop per thread + thread pool （多个IO线程 + 计算线程池）
+
+## 文件传输（MuduoManual.pdf P57）
+ - examples/filetransfer/download.cc
+ - examples/filetransfer/download2.cc
+ - examples/filetransfer/download3.cc
+ - tests/Filetransfer_test.cc
+
