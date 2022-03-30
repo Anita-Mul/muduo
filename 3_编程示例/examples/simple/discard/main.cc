@@ -6,13 +6,19 @@
 using namespace muduo;
 using namespace muduo::net;
 
+/*
+  丢弃所有收到的数据
+*/
 int main()
 {
-  LOG_INFO << "pid = " << getpid();
-  EventLoop loop;
-  InetAddress listenAddr(2009);
-  DiscardServer server(&loop, listenAddr);
-  server.start();
-  loop.loop();
+    LOG_INFO << "pid = " << getpid();
+
+    EventLoop loop;
+    InetAddress listenAddr(2009);
+
+    DiscardServer server(&loop, listenAddr);
+    
+    server.start();
+    loop.loop();
 }
 

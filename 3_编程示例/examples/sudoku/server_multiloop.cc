@@ -20,123 +20,137 @@ using namespace muduo::net;
 
 class SudokuServer
 {
- public:
-  SudokuServer(EventLoop* loop, const InetAddress& listenAddr, int numThreads)
-    : loop_(loop),
-      server_(loop, listenAddr, "SudokuServer"),
-      numThreads_(numThreads),
-      startTime_(Timestamp::now())
-  {
-    server_.setConnectionCallback(
-        boost::bind(&SudokuServer::onConnection, this, _1));
-    server_.setMessageCallback(
-        boost::bind(&SudokuServer::onMessage, this, _1, _2, _3));
-    server_.setThreadNum(numThreads);
-  }
-
-  void start()
-  {
-    LOG_INFO << "starting " << numThreads_ << " threads.";
-    server_.start();
-  }
-
- private:
-  void onConnection(const TcpConnectionPtr& conn)
-  {
-    LOG_TRACE << conn->peerAddress().toIpPort() << " -> "
-        << conn->localAddress().toIpPort() << " is "
-        << (conn->connected() ? "UP" : "DOWN");
-  }
-
-  void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp)
-  {
-    LOG_DEBUG << conn->name();
-    size_t len = buf->readableBytes();
-    while (len >= kCells + 2)
-    {
-      const char* crlf = buf->findCRLF();
-      if (crlf)
-      {
-        string request(buf->peek(), crlf);
-        buf->retrieveUntil(crlf + 2);
-        len = buf->readableBytes();
-        if (!processRequest(conn, request))
+    public:
+        SudokuServer(EventLoop* loop, const InetAddress& listenAddr, int numThreads)
+          : loop_(loop),
+            server_(loop, listenAddr, "SudokuServer"),
+            numThreads_(numThreads),
+            startTime_(Timestamp::now())
         {
-          conn->send("Bad Request!\r\n");
-          conn->shutdown();
-          break;
+            server_.setConnectionCallback(
+                boost::bind(&SudokuServer::onConnection, this, _1));
+            server_.setMessageCallback(
+                boost::bind(&SudokuServer::onMessage, this, _1, _2, _3));
+            server_.setThreadNum(numThreads);
         }
-      }
-      else if (len > 100) // id + ":" + kCells + "\r\n"
-      {
-        conn->send("Id too long!\r\n");
-        conn->shutdown();
-        break;
-      }
-      else
-      {
-        break;
-      }
-    }
-  }
 
-  bool processRequest(const TcpConnectionPtr& conn, const string& request)
-  {
-    string id;
-    string puzzle;
-    bool goodRequest = true;
+        void start()
+        {
+            LOG_INFO << "starting " << numThreads_ << " threads.";
+            server_.start();
+        }
 
-    string::const_iterator colon = find(request.begin(), request.end(), ':');
-    if (colon != request.end())
-    {
-      id.assign(request.begin(), colon);
-      puzzle.assign(colon+1, request.end());
-    }
-    else
-    {
-      puzzle = request;
-    }
-
-    if (puzzle.size() == implicit_cast<size_t>(kCells))
-    {
-      LOG_DEBUG << conn->name();
-      string result = solveSudoku(puzzle);
-      if (id.empty())
+    private:
+      void onConnection(const TcpConnectionPtr& conn)
       {
-        conn->send(result+"\r\n");
+          LOG_TRACE << conn->peerAddress().toIpPort() << " -> "
+              << conn->localAddress().toIpPort() << " is "
+              << (conn->connected() ? "UP" : "DOWN");
       }
-      else
-      {
-        conn->send(id+":"+result+"\r\n");
-      }
-    }
-    else
-    {
-      goodRequest = false;
-    }
-    return goodRequest;
-  }
 
-  EventLoop* loop_;
-  TcpServer server_;
-  int numThreads_;
-  Timestamp startTime_;
+      void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp)
+      {
+          LOG_DEBUG << conn->name();
+          size_t len = buf->readableBytes();
+
+          while (len >= kCells + 2)
+          {
+              const char* crlf = buf->findCRLF();
+
+              if (crlf)
+              {
+                  string request(buf->peek(), crlf);
+                  buf->retrieveUntil(crlf + 2);
+                  len = buf->readableBytes();
+
+                  if (!processRequest(conn, request))
+                  {
+                      conn->send("Bad Request!\r\n");
+                      conn->shutdown();
+                      break;
+                  }
+              }
+              else if (len > 100) // id + ":" + kCells + "\r\n"
+              {
+                  conn->send("Id too long!\r\n");
+                  conn->shutdown();
+                  break;
+              }
+              else
+              {
+                  break;
+              }
+          }
+      }
+
+      bool processRequest(const TcpConnectionPtr& conn, const string& request)
+      {
+          string id;
+          string puzzle;
+          bool goodRequest = true;
+
+          string::const_iterator colon = find(request.begin(), request.end(), ':');
+
+          if (colon != request.end())
+          {
+              id.assign(request.begin(), colon);
+              puzzle.assign(colon+1, request.end());
+          }
+          else
+          {
+              puzzle = request;
+          }
+
+          if (puzzle.size() == implicit_cast<size_t>(kCells))
+          {
+              LOG_DEBUG << conn->name();
+              string result = solveSudoku(puzzle);
+              if (id.empty())
+              {
+                  conn->send(result+"\r\n");
+              }
+              else
+              {
+                  conn->send(id+":"+result+"\r\n");
+              }
+          }
+          else
+          {
+              goodRequest = false;
+          }
+
+          return goodRequest;
+      }
+
+      EventLoop* loop_;
+      TcpServer server_;
+      int numThreads_;
+      Timestamp startTime_;
 };
 
+// multi reactor 
+// IO 线程的数目
+// EventLoopThreadPool IO线程池
+// main reactor 负责 listenfd accept
+// sub reactor 负责 connfd
+// roundbin 轮叫
+// 来一个连接，就选择下一个 EventLoop
+// 这样就让多个连接分配给若干个 EventLoop 来处理，而每个 EventLoop 属于一个 IO 线程
+// 也就意味着，多个连接分配给若干个IO线程来处理
 int main(int argc, char* argv[])
 {
-  LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
-  int numThreads = 0;
-  if (argc > 1)
-  {
-    numThreads = atoi(argv[1]);
-  }
-  EventLoop loop;
-  InetAddress listenAddr(9981);
-  SudokuServer server(&loop, listenAddr, numThreads);
+    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+    int numThreads = 0;
+    if (argc > 1)
+    {
+        numThreads = atoi(argv[1]);
+    }
+    EventLoop loop;
+    InetAddress listenAddr(9981);
+    SudokuServer server(&loop, listenAddr, numThreads);
 
-  server.start();
+    server.start();
 
-  loop.loop();
+    loop.loop();
 }
 

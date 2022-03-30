@@ -21,132 +21,144 @@ using namespace muduo::net;
 
 class SudokuServer
 {
- public:
-  SudokuServer(EventLoop* loop, const InetAddress& listenAddr, int numThreads)
-    : loop_(loop),
-      server_(loop, listenAddr, "SudokuServer"),
-      numThreads_(numThreads),
-      startTime_(Timestamp::now())
-  {
-    server_.setConnectionCallback(
-        boost::bind(&SudokuServer::onConnection, this, _1));
-    server_.setMessageCallback(
-        boost::bind(&SudokuServer::onMessage, this, _1, _2, _3));
-	//server_.setThreadNum(4);
-  }
-
-  void start()
-  {
-    LOG_INFO << "starting " << numThreads_ << " threads.";
-    threadPool_.start(numThreads_);
-    server_.start();
-  }
-
- private:
-  void onConnection(const TcpConnectionPtr& conn)
-  {
-    LOG_TRACE << conn->peerAddress().toIpPort() << " -> "
-        << conn->localAddress().toIpPort() << " is "
-        << (conn->connected() ? "UP" : "DOWN");
-  }
-
-  void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp)
-  {
-    LOG_DEBUG << conn->name();
-    size_t len = buf->readableBytes();
-    while (len >= kCells + 2)
-    {
-      const char* crlf = buf->findCRLF();
-      if (crlf)
-      {
-        string request(buf->peek(), crlf);
-        buf->retrieveUntil(crlf + 2);
-        len = buf->readableBytes();
-        if (!processRequest(conn, request))
+    public:
+        SudokuServer(EventLoop* loop, const InetAddress& listenAddr, int numThreads)
+          : loop_(loop),
+            server_(loop, listenAddr, "SudokuServer"),
+            numThreads_(numThreads),
+            startTime_(Timestamp::now())
         {
-          conn->send("Bad Request!\r\n");
-          conn->shutdown();
-          break;
+            server_.setConnectionCallback(
+                boost::bind(&SudokuServer::onConnection, this, _1));
+            server_.setMessageCallback(
+                boost::bind(&SudokuServer::onMessage, this, _1, _2, _3));
+            //server_.setThreadNum(4);
         }
-      }
-      else if (len > 100) // id + ":" + kCells + "\r\n"
-      {
-        conn->send("Id too long!\r\n");
-        conn->shutdown();
-        break;
-      }
-      else
-      {
-        break;
-      }
-    }
-  }
 
-  bool processRequest(const TcpConnectionPtr& conn, const string& request)
-  {
-    string id;
-    string puzzle;
-    bool goodRequest = true;
+        void start()
+        {
+            LOG_INFO << "starting " << numThreads_ << " threads.";
+            threadPool_.start(numThreads_);
+            server_.start();
+        }
 
-    string::const_iterator colon = find(request.begin(), request.end(), ':');
-    if (colon != request.end())
-    {
-      id.assign(request.begin(), colon);
-      puzzle.assign(colon+1, request.end());
-    }
-    else
-    {
-      puzzle = request;
-    }
+    private:
+        void onConnection(const TcpConnectionPtr& conn)
+        {
+            LOG_TRACE << conn->peerAddress().toIpPort() << " -> "
+                << conn->localAddress().toIpPort() << " is "
+                << (conn->connected() ? "UP" : "DOWN");
+        }
 
-    if (puzzle.size() == implicit_cast<size_t>(kCells))
-    {
-      threadPool_.run(boost::bind(&solve, conn, puzzle, id));
-    }
-    else
-    {
-      goodRequest = false;
-    }
-    return goodRequest;
-  }
+        void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp)
+        {
+            LOG_DEBUG << conn->name();
+            size_t len = buf->readableBytes();
 
-  static void solve(const TcpConnectionPtr& conn,
-                    const string& puzzle,
-                    const string& id)
-  {
-    LOG_DEBUG << conn->name();
-    string result = solveSudoku(puzzle);
-    if (id.empty())
-    {
-      conn->send(result+"\r\n");
-    }
-    else
-    {
-      conn->send(id+":"+result+"\r\n");
-    }
-  }
+            while (len >= kCells + 2)
+            {
+                const char* crlf = buf->findCRLF();
 
-  EventLoop* loop_;
-  TcpServer server_;
-  ThreadPool threadPool_;
-  int numThreads_;
-  Timestamp startTime_;
+                if (crlf)
+                {
+                    string request(buf->peek(), crlf);
+                    buf->retrieveUntil(crlf + 2);
+                    len = buf->readableBytes();
+
+                    if (!processRequest(conn, request))
+                    {
+                        conn->send("Bad Request!\r\n");
+                        conn->shutdown();
+                        break;
+                    }
+                }
+                else if (len > 100) // id + ":" + kCells + "\r\n"
+                {
+                    conn->send("Id too long!\r\n");
+                    conn->shutdown();
+                    break;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        bool processRequest(const TcpConnectionPtr& conn, const string& request)
+        {
+            string id;
+            string puzzle;
+            bool goodRequest = true;
+
+            string::const_iterator colon = find(request.begin(), request.end(), ':');
+            if (colon != request.end())
+            {
+                id.assign(request.begin(), colon);
+                puzzle.assign(colon+1, request.end());
+            }
+            else
+            {
+                puzzle = request;
+            }
+
+            if (puzzle.size() == implicit_cast<size_t>(kCells))
+            {
+                // 将计算任务让线程池来处理
+                threadPool_.run(boost::bind(&solve, conn, puzzle, id));
+            }
+            else
+            {
+                goodRequest = false;
+            }
+
+            return goodRequest;
+        }
+
+        static void solve(const TcpConnectionPtr& conn,
+                          const string& puzzle,
+                          const string& id)
+        {
+            LOG_DEBUG << conn->name();
+            string result = solveSudoku(puzzle);
+
+            if (id.empty())
+            {
+                conn->send(result+"\r\n");
+            }
+            else
+            {
+                conn->send(id+":"+result+"\r\n");
+            }
+        }
+
+        EventLoop* loop_;
+        TcpServer server_;
+        ThreadPool threadPool_;
+        int numThreads_;
+        Timestamp startTime_; 
 };
 
+// sudoku 求解服务器，既是 IO 密集型，又是计算密集型的一个服务
+// IO 线程池 + 计算线程池
+// 计算时间如果比较久，就会使得 IO 线程阻塞，IO线程很快就用尽了，就不能处理大量的并发连接
+// 一个IO线程 + 计算线程池
 int main(int argc, char* argv[])
 {
-  LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
-  int numThreads = 0;
-  if (argc > 1)
-  {
-    numThreads = atoi(argv[1]);
-  }
-  EventLoop loop;
-  InetAddress listenAddr(9981);
-  SudokuServer server(&loop, listenAddr, numThreads);
+    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+    int numThreads = 0;
 
-  server.start();
+    if (argc > 1)
+    {
+        numThreads = atoi(argv[1]);
+    }
 
-  loop.loop();
+    EventLoop loop;
+    InetAddress listenAddr(9981);
+    SudokuServer server(&loop, listenAddr, numThreads);
+
+    server.start();
+
+    loop.loop();
 }
 

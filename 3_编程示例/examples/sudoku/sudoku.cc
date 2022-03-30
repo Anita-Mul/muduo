@@ -256,33 +256,37 @@ class SudokuSolver
     }
 };
 
+// 解出数独的函数
 string solveSudoku(const string& puzzle)
 {
-  assert(puzzle.size() == implicit_cast<size_t>(kCells));
+    assert(puzzle.size() == implicit_cast<size_t>(kCells));
 
-  string result = "NoSolution";
+    string result = "NoSolution";
 
-  int board[kCells] = { 0 };
-  bool valid = true;
-  for (int i = 0; i < kCells; ++i)
-  {
-    board[i] = puzzle[i] - '0';
-    valid = valid && (0 <= board[i] && board[i] <= 9);
-  }
+    int board[kCells] = { 0 };
+    bool valid = true;
 
-  if (valid)
-  {
-    SudokuSolver s(board);
-    if (s.solve())
+    for (int i = 0; i < kCells; ++i)
     {
-      result.clear();
-      result.resize(kCells);
-      for (int i = 0; i < kCells; ++i)
-      {
-        result[i] = static_cast<char>(board[i] + '0');
-      }
+        board[i] = puzzle[i] - '0';
+        valid = valid && (0 <= board[i] && board[i] <= 9);
     }
-  }
-  return result;
+
+    if (valid)
+    {
+        SudokuSolver s(board);
+
+        if (s.solve())
+        {
+            result.clear();
+            result.resize(kCells);
+            for (int i = 0; i < kCells; ++i)
+            {
+                result[i] = static_cast<char>(board[i] + '0');
+            }
+        }
+    }
+
+    return result;
 }
 

@@ -6,21 +6,21 @@
 // RFC 868
 class TimeServer
 {
- public:
-  TimeServer(muduo::net::EventLoop* loop,
-             const muduo::net::InetAddress& listenAddr);
+    public:
+        TimeServer(muduo::net::EventLoop* loop,
+                  const muduo::net::InetAddress& listenAddr);
 
-  void start();
+        void start();
 
- private:
-  void onConnection(const muduo::net::TcpConnectionPtr& conn);
+    private:
+        void onConnection(const muduo::net::TcpConnectionPtr& conn);
 
-  void onMessage(const muduo::net::TcpConnectionPtr& conn,
-                 muduo::net::Buffer* buf,
-                 muduo::Timestamp time);
+        void onMessage(const muduo::net::TcpConnectionPtr& conn,
+                      muduo::net::Buffer* buf,
+                      muduo::Timestamp time);
 
-  muduo::net::EventLoop* loop_;
-  muduo::net::TcpServer server_;
+        muduo::net::EventLoop* loop_;
+        muduo::net::TcpServer server_;
 };
 
 #endif  // MUDUO_EXAMPLES_SIMPLE_TIME_TIME_H
