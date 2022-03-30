@@ -22,44 +22,61 @@
 
 namespace muduo
 {
-namespace net
-{
+    namespace net
+    {
+        class ProcessInspector;
 
-class ProcessInspector;
+        // A internal inspector of the running process, usually a singleton.
+        class Inspector : boost::noncopyable
+        {
+            public:
+                typedef std::vector<string> ArgList;
+                typedef boost::function<string (HttpRequest::Method, const ArgList& args)> Callback;
+                Inspector(EventLoop* loop,
+                          const InetAddress& httpAddr,
+                          const string& name);
+                ~Inspector();
 
-// A internal inspector of the running process, usually a singleton.
-class Inspector : boost::noncopyable
-{
- public:
-  typedef std::vector<string> ArgList;
-  typedef boost::function<string (HttpRequest::Method, const ArgList& args)> Callback;
-  Inspector(EventLoop* loop,
-            const InetAddress& httpAddr,
-            const string& name);
-  ~Inspector();
+                // 如add("proc", "pid", ProcessInspector::pid, "print pid");
+                // http://192.168.159.188:12345/proc/pid这个http请求就会相应的调用ProcessInspector::pid来处理
+                void add(const string& module,
+                        const string& command,
+                        const Callback& cb,
+                        const string& help);
 
-  // 如add("proc", "pid", ProcessInspector::pid, "print pid");
-  // http://192.168.159.188:12345/proc/pid这个http请求就会相应的调用ProcessInspector::pid来处理
-  void add(const string& module,
-           const string& command,
-           const Callback& cb,
-           const string& help);
+            private:
+                /*
+                    /proc/opened_files      count /proc/self/fd
+                    /proc/pid               print pid
+                    /proc/status            print /proc/self/status
+                    /proc/threads           list /proc/self/task
 
- private:
-  typedef std::map<string, Callback> CommandList;
-  typedef std::map<string, string> HelpList;
+                    CommandList
+                        opened_files - callback
+                        pid          - callback
+                        ...
 
-  void start();
-  void onRequest(const HttpRequest& req, HttpResponse* resp);
+                    HelpList
+                        opened_files - count /proc/self/fd
+                        pid          - print pid
+                        ...
+                */
+                typedef std::map<string, Callback> CommandList;
+                typedef std::map<string, string> HelpList;
 
-  HttpServer server_;
-  boost::scoped_ptr<ProcessInspector> processInspector_;
-  MutexLock mutex_;
-  std::map<string, CommandList> commands_;
-  std::map<string, HelpList> helps_;
-};
+                void start();
+                void onRequest(const HttpRequest& req, HttpResponse* resp);
 
-}
+                HttpServer server_;
+                boost::scoped_ptr<ProcessInspector> processInspector_;
+                MutexLock mutex_;
+                /*
+                    string 指的是 /proc 等模块
+                */
+                std::map<string, CommandList> commands_;
+                std::map<string, HelpList> helps_;
+        };
+    }
 }
 
 #endif  // MUDUO_NET_INSPECT_INSPECTOR_H

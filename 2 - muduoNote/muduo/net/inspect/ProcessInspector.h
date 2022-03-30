@@ -16,23 +16,20 @@
 
 namespace muduo
 {
-namespace net
-{
+    namespace net
+    {
+        class ProcessInspector : boost::noncopyable
+        {
+          public:
+              void registerCommands(Inspector* ins);	// 注册命令接口
 
-class ProcessInspector : boost::noncopyable
-{
- public:
-  void registerCommands(Inspector* ins);	// 注册命令接口
-
- private:
-  static string pid(HttpRequest::Method, const Inspector::ArgList&);
-  static string procStatus(HttpRequest::Method, const Inspector::ArgList&);
-  static string openedFiles(HttpRequest::Method, const Inspector::ArgList&);
-  static string threads(HttpRequest::Method, const Inspector::ArgList&);
-
-};
-
-}
+          private:
+              static string pid(HttpRequest::Method, const Inspector::ArgList&);
+              static string procStatus(HttpRequest::Method, const Inspector::ArgList&);
+              static string openedFiles(HttpRequest::Method, const Inspector::ArgList&);
+              static string threads(HttpRequest::Method, const Inspector::ArgList&);
+        };
+    }
 }
 
 #endif  // MUDUO_NET_INSPECT_PROCESSINSPECTOR_H

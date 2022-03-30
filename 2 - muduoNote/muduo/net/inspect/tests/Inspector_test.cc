@@ -7,9 +7,9 @@ using namespace muduo::net;
 
 int main()
 {
-  EventLoop loop;
-  EventLoopThread t;	// 监控线程
-  Inspector ins(t.startLoop(), InetAddress(12345), "test");
-  loop.loop();
+    EventLoop loop;
+    EventLoopThread t;	// 监控线程，应该是守护进程吧
+    Inspector ins(t.startLoop(), InetAddress(12345), "test");
+    loop.loop();
 }
 
