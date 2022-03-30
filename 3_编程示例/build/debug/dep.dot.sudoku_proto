@@ -1,0 +1,10 @@
+digraph "sudoku_proto" {
+node [
+  fontsize = "12"
+];
+    "node62" [ label = "sudoku_proto", shape = octagon ];
+    "node22" [ label = "protobuf", shape = septagon ];
+    "node62" -> "node22"  // sudoku_proto -> protobuf
+    "node3" [ label = "pthread", shape = septagon ];
+    "node62" -> "node3"  // sudoku_proto -> pthread
+}

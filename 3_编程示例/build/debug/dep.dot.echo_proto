@@ -1,0 +1,10 @@
+digraph "echo_proto" {
+node [
+  fontsize = "12"
+];
+    "node21" [ label = "echo_proto", shape = octagon ];
+    "node22" [ label = "protobuf", shape = septagon ];
+    "node21" -> "node22"  // echo_proto -> protobuf
+    "node3" [ label = "pthread", shape = septagon ];
+    "node21" -> "node3"  // echo_proto -> pthread
+}

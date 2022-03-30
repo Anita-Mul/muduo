@@ -1,0 +1,122 @@
+digraph "muduo" {
+node [
+  fontsize = "12"
+];
+subgraph clusterLegend {
+  label = "Legend";
+  color = black;
+  edge [ style = invis ];
+  legendNode0 [ label = "Executable", shape = egg ];
+  legendNode1 [ label = "Static Library", shape = octagon ];
+  legendNode2 [ label = "Shared Library", shape = doubleoctagon ];
+  legendNode3 [ label = "Module Library", shape = tripleoctagon ];
+  legendNode4 [ label = "Interface Library", shape = pentagon ];
+  legendNode5 [ label = "Object Library", shape = hexagon ];
+  legendNode6 [ label = "Unknown Library", shape = septagon ];
+  legendNode7 [ label = "Custom Target", shape = box ];
+  legendNode0 -> legendNode1 [ style = solid ];
+  legendNode0 -> legendNode2 [ style = solid ];
+  legendNode0 -> legendNode3;
+  legendNode1 -> legendNode4 [ label = "Interface", style = dashed ];
+  legendNode2 -> legendNode5 [ label = "Private", style = dotted ];
+  legendNode3 -> legendNode6 [ style = solid ];
+  legendNode0 -> legendNode7;
+}
+    "node0" [ label = "Types_test", shape = egg ];
+    "node1" [ label = "muduo_base", shape = octagon ];
+    "node2" [ label = "pthread", shape = septagon ];
+    "node1" -> "node2"  // muduo_base -> pthread
+    "node3" [ label = "rt", shape = septagon ];
+    "node1" -> "node3"  // muduo_base -> rt
+    "node0" -> "node1" [ style = dotted ] // Types_test -> muduo_base
+    "node4" [ label = "atomic_unittest", shape = egg ];
+    "node5" [ label = "blockingqueue_bench", shape = egg ];
+    "node5" -> "node1" [ style = dotted ] // blockingqueue_bench -> muduo_base
+    "node6" [ label = "blockingqueue_test", shape = egg ];
+    "node6" -> "node1" [ style = dotted ] // blockingqueue_test -> muduo_base
+    "node7" [ label = "boundedblockingqueue_test", shape = egg ];
+    "node7" -> "node1" [ style = dotted ] // boundedblockingqueue_test -> muduo_base
+    "node8" [ label = "bsa", shape = egg ];
+    "node9" [ label = "countdownlatch_test1", shape = egg ];
+    "node9" -> "node1" [ style = dotted ] // countdownlatch_test1 -> muduo_base
+    "node10" [ label = "countdownlatch_test2", shape = egg ];
+    "node10" -> "node1" [ style = dotted ] // countdownlatch_test2 -> muduo_base
+    "node11" [ label = "deadlock_test", shape = egg ];
+    "node11" -> "node2" [ style = dotted ] // deadlock_test -> pthread
+    "node12" [ label = "deadlock_test2", shape = egg ];
+    "node12" -> "node2" [ style = dotted ] // deadlock_test2 -> pthread
+    "node13" [ label = "exception_test", shape = egg ];
+    "node13" -> "node1" [ style = dotted ] // exception_test -> muduo_base
+    "node14" [ label = "fileutil_test", shape = egg ];
+    "node14" -> "node1" [ style = dotted ] // fileutil_test -> muduo_base
+    "node15" [ label = "httprequest_unittest", shape = egg ];
+    "node16" [ label = "boost_unit_test_framework", shape = septagon ];
+    "node15" -> "node16" [ style = dotted ] // httprequest_unittest -> boost_unit_test_framework
+    "node17" [ label = "muduo_http", shape = octagon ];
+    "node18" [ label = "muduo_net", shape = octagon ];
+    "node18" -> "node1"  // muduo_net -> muduo_base
+    "node17" -> "node18"  // muduo_http -> muduo_net
+    "node15" -> "node17" [ style = dotted ] // httprequest_unittest -> muduo_http
+    "node19" [ label = "httpserver_test", shape = egg ];
+    "node19" -> "node17" [ style = dotted ] // httpserver_test -> muduo_http
+    "node20" [ label = "inetaddress_unittest", shape = egg ];
+    "node20" -> "node16" [ style = dotted ] // inetaddress_unittest -> boost_unit_test_framework
+    "node20" -> "node18" [ style = dotted ] // inetaddress_unittest -> muduo_net
+    "node21" [ label = "inspector_test", shape = egg ];
+    "node22" [ label = "muduo_inspect", shape = octagon ];
+    "node22" -> "node17"  // muduo_inspect -> muduo_http
+    "node21" -> "node22" [ style = dotted ] // inspector_test -> muduo_inspect
+    "node23" [ label = "log_test1", shape = egg ];
+    "node23" -> "node1" [ style = dotted ] // log_test1 -> muduo_base
+    "node24" [ label = "log_test2", shape = egg ];
+    "node24" -> "node1" [ style = dotted ] // log_test2 -> muduo_base
+    "node25" [ label = "logfile_test", shape = egg ];
+    "node25" -> "node1" [ style = dotted ] // logfile_test -> muduo_base
+    "node26" [ label = "logging_test", shape = egg ];
+    "node26" -> "node1" [ style = dotted ] // logging_test -> muduo_base
+    "node27" [ label = "logstream_bench", shape = egg ];
+    "node27" -> "node1" [ style = dotted ] // logstream_bench -> muduo_base
+    "node28" [ label = "logstream_test", shape = egg ];
+    "node28" -> "node16" [ style = dotted ] // logstream_test -> boost_unit_test_framework
+    "node28" -> "node1" [ style = dotted ] // logstream_test -> muduo_base
+    "node29" [ label = "mutex_test", shape = egg ];
+    "node29" -> "node1" [ style = dotted ] // mutex_test -> muduo_base
+    "node30" [ label = "pthread_atfork_test", shape = egg ];
+    "node30" -> "node2" [ style = dotted ] // pthread_atfork_test -> pthread
+    "node31" [ label = "reactor_test01", shape = egg ];
+    "node31" -> "node18" [ style = dotted ] // reactor_test01 -> muduo_net
+    "node32" [ label = "reactor_test02", shape = egg ];
+    "node32" -> "node18" [ style = dotted ] // reactor_test02 -> muduo_net
+    "node33" [ label = "reactor_test03", shape = egg ];
+    "node33" -> "node18" [ style = dotted ] // reactor_test03 -> muduo_net
+    "node34" [ label = "reactor_test04", shape = egg ];
+    "node34" -> "node18" [ style = dotted ] // reactor_test04 -> muduo_net
+    "node35" [ label = "reactor_test05", shape = egg ];
+    "node35" -> "node18" [ style = dotted ] // reactor_test05 -> muduo_net
+    "node36" [ label = "reactor_test06", shape = egg ];
+    "node36" -> "node18" [ style = dotted ] // reactor_test06 -> muduo_net
+    "node37" [ label = "reactor_test07", shape = egg ];
+    "node37" -> "node18" [ style = dotted ] // reactor_test07 -> muduo_net
+    "node38" [ label = "reactor_test11", shape = egg ];
+    "node38" -> "node18" [ style = dotted ] // reactor_test11 -> muduo_net
+    "node39" [ label = "reactor_test12", shape = egg ];
+    "node39" -> "node18" [ style = dotted ] // reactor_test12 -> muduo_net
+    "node40" [ label = "reactor_test13", shape = egg ];
+    "node40" -> "node18" [ style = dotted ] // reactor_test13 -> muduo_net
+    "node41" [ label = "singleton_test", shape = egg ];
+    "node41" -> "node1" [ style = dotted ] // singleton_test -> muduo_base
+    "node42" [ label = "singletonthreadlocal_test", shape = egg ];
+    "node42" -> "node1" [ style = dotted ] // singletonthreadlocal_test -> muduo_base
+    "node43" [ label = "tcpclient_test", shape = egg ];
+    "node43" -> "node18" [ style = dotted ] // tcpclient_test -> muduo_net
+    "node44" [ label = "thread_test", shape = egg ];
+    "node44" -> "node1" [ style = dotted ] // thread_test -> muduo_base
+    "node45" [ label = "threadlocal_test", shape = egg ];
+    "node45" -> "node1" [ style = dotted ] // threadlocal_test -> muduo_base
+    "node46" [ label = "threadlocalsingleton_test", shape = egg ];
+    "node46" -> "node1" [ style = dotted ] // threadlocalsingleton_test -> muduo_base
+    "node47" [ label = "threadpool_test", shape = egg ];
+    "node47" -> "node1" [ style = dotted ] // threadpool_test -> muduo_base
+    "node48" [ label = "timestamp_unittest", shape = egg ];
+    "node48" -> "node1" [ style = dotted ] // timestamp_unittest -> muduo_base
+}

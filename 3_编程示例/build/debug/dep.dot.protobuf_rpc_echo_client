@@ -1,0 +1,14 @@
+digraph "protobuf_rpc_echo_client" {
+node [
+  fontsize = "12"
+];
+    "node58" [ label = "protobuf_rpc_echo_client", shape = egg ];
+    "node21" [ label = "echo_proto", shape = octagon ];
+    "node58" -> "node21" [ style = dotted ] // protobuf_rpc_echo_client -> echo_proto
+    "node22" [ label = "protobuf", shape = septagon ];
+    "node21" -> "node22"  // echo_proto -> protobuf
+    "node3" [ label = "pthread", shape = septagon ];
+    "node21" -> "node3"  // echo_proto -> pthread
+    "node59" [ label = "muduo_protorpc", shape = septagon ];
+    "node58" -> "node59" [ style = dotted ] // protobuf_rpc_echo_client -> muduo_protorpc
+}

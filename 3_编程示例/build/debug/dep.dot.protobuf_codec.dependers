@@ -1,0 +1,12 @@
+digraph "protobuf_codec" {
+node [
+  fontsize = "12"
+];
+    "node51" [ label = "protobuf_codec", shape = octagon ];
+    "node50" [ label = "protobuf_client", shape = egg ];
+    "node50" -> "node51" [ style = dotted ] // protobuf_client -> protobuf_codec
+    "node54" [ label = "protobuf_codec_test", shape = egg ];
+    "node54" -> "node51" [ style = dotted ] // protobuf_codec_test -> protobuf_codec
+    "node57" [ label = "protobuf_server", shape = egg ];
+    "node57" -> "node51" [ style = dotted ] // protobuf_server -> protobuf_codec
+}

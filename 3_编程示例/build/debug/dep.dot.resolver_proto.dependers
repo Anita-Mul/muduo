@@ -1,0 +1,10 @@
+digraph "resolver_proto" {
+node [
+  fontsize = "12"
+];
+    "node65" [ label = "resolver_proto", shape = octagon ];
+    "node64" [ label = "protobuf_rpc_resolver_client", shape = egg ];
+    "node64" -> "node65" [ style = dotted ] // protobuf_rpc_resolver_client -> resolver_proto
+    "node66" [ label = "protobuf_rpc_resolver_server", shape = egg ];
+    "node66" -> "node65" [ style = dotted ] // protobuf_rpc_resolver_server -> resolver_proto
+}

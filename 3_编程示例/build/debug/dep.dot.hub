@@ -1,0 +1,18 @@
+digraph "hub" {
+node [
+  fontsize = "12"
+];
+    "node31" [ label = "hub", shape = egg ];
+    "node32" [ label = "muduo_inspect", shape = octagon ];
+    "node31" -> "node32" [ style = dotted ] // hub -> muduo_inspect
+    "node29" [ label = "muduo_http", shape = octagon ];
+    "node32" -> "node29"  // muduo_inspect -> muduo_http
+    "node1" [ label = "muduo_net", shape = octagon ];
+    "node29" -> "node1"  // muduo_http -> muduo_net
+    "node2" [ label = "muduo_base", shape = octagon ];
+    "node1" -> "node2"  // muduo_net -> muduo_base
+    "node3" [ label = "pthread", shape = septagon ];
+    "node2" -> "node3"  // muduo_base -> pthread
+    "node4" [ label = "rt", shape = septagon ];
+    "node2" -> "node4"  // muduo_base -> rt
+}

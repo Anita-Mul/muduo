@@ -1,0 +1,10 @@
+digraph "query_proto" {
+node [
+  fontsize = "12"
+];
+    "node53" [ label = "query_proto", shape = octagon ];
+    "node22" [ label = "protobuf", shape = septagon ];
+    "node53" -> "node22"  // query_proto -> protobuf
+    "node3" [ label = "pthread", shape = septagon ];
+    "node53" -> "node3"  // query_proto -> pthread
+}

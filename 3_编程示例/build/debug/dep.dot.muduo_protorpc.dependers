@@ -1,0 +1,18 @@
+digraph "muduo_protorpc" {
+node [
+  fontsize = "12"
+];
+    "node59" [ label = "muduo_protorpc", shape = septagon ];
+    "node58" [ label = "protobuf_rpc_echo_client", shape = egg ];
+    "node58" -> "node59" [ style = dotted ] // protobuf_rpc_echo_client -> muduo_protorpc
+    "node60" [ label = "protobuf_rpc_echo_server", shape = egg ];
+    "node60" -> "node59" [ style = dotted ] // protobuf_rpc_echo_server -> muduo_protorpc
+    "node61" [ label = "protobuf_rpc_sudoku_client", shape = egg ];
+    "node61" -> "node59" [ style = dotted ] // protobuf_rpc_sudoku_client -> muduo_protorpc
+    "node63" [ label = "protobuf_rpc_sudoku_server", shape = egg ];
+    "node63" -> "node59" [ style = dotted ] // protobuf_rpc_sudoku_server -> muduo_protorpc
+    "node64" [ label = "protobuf_rpc_resolver_client", shape = egg ];
+    "node64" -> "node59" [ style = dotted ] // protobuf_rpc_resolver_client -> muduo_protorpc
+    "node66" [ label = "protobuf_rpc_resolver_server", shape = egg ];
+    "node66" -> "node59" [ style = dotted ] // protobuf_rpc_resolver_server -> muduo_protorpc
+}

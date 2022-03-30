@@ -1,0 +1,16 @@
+digraph "muduo_curl" {
+node [
+  fontsize = "12"
+];
+    "node19" [ label = "muduo_curl", shape = octagon ];
+    "node20" [ label = "curl", shape = septagon ];
+    "node19" -> "node20"  // muduo_curl -> curl
+    "node1" [ label = "muduo_net", shape = octagon ];
+    "node19" -> "node1"  // muduo_curl -> muduo_net
+    "node2" [ label = "muduo_base", shape = octagon ];
+    "node1" -> "node2"  // muduo_net -> muduo_base
+    "node3" [ label = "pthread", shape = septagon ];
+    "node2" -> "node3"  // muduo_base -> pthread
+    "node4" [ label = "rt", shape = septagon ];
+    "node2" -> "node4"  // muduo_base -> rt
+}

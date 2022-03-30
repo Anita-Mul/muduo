@@ -1,0 +1,16 @@
+digraph "httpserver_test" {
+node [
+  fontsize = "12"
+];
+    "node19" [ label = "httpserver_test", shape = egg ];
+    "node17" [ label = "muduo_http", shape = octagon ];
+    "node19" -> "node17" [ style = dotted ] // httpserver_test -> muduo_http
+    "node18" [ label = "muduo_net", shape = octagon ];
+    "node17" -> "node18"  // muduo_http -> muduo_net
+    "node1" [ label = "muduo_base", shape = octagon ];
+    "node18" -> "node1"  // muduo_net -> muduo_base
+    "node2" [ label = "pthread", shape = septagon ];
+    "node1" -> "node2"  // muduo_base -> pthread
+    "node3" [ label = "rt", shape = septagon ];
+    "node1" -> "node3"  // muduo_base -> rt
+}

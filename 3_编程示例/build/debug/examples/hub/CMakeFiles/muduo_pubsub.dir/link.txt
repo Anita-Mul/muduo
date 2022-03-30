@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../lib/libmuduo_pubsub.a CMakeFiles/muduo_pubsub.dir/pubsub.cc.o CMakeFiles/muduo_pubsub.dir/codec.cc.o
+/usr/bin/ranlib ../../lib/libmuduo_pubsub.a

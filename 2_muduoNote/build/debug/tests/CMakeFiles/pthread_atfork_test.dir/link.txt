@@ -1,0 +1,1 @@
+g++ -g -D_FILE_OFFSET_BITS=64 -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -march=native -rdynamic -O0 -rdynamic CMakeFiles/pthread_atfork_test.dir/Pthread_atfork_test.cc.o -o ../bin/pthread_atfork_test  -lpthread 

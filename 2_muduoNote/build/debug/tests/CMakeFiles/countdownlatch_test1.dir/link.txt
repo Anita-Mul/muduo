@@ -1,0 +1,1 @@
+g++ -g -D_FILE_OFFSET_BITS=64 -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -march=native -rdynamic -O0 -rdynamic CMakeFiles/countdownlatch_test1.dir/CountDownLatch_test1.cc.o -o ../bin/countdownlatch_test1  ../lib/libmuduo_base.a -lpthread -lrt 

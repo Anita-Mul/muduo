@@ -1,0 +1,26 @@
+digraph "protobuf_client" {
+node [
+  fontsize = "12"
+];
+    "node50" [ label = "protobuf_client", shape = egg ];
+    "node51" [ label = "protobuf_codec", shape = octagon ];
+    "node50" -> "node51" [ style = dotted ] // protobuf_client -> protobuf_codec
+    "node1" [ label = "muduo_net", shape = octagon ];
+    "node51" -> "node1"  // protobuf_codec -> muduo_net
+    "node2" [ label = "muduo_base", shape = octagon ];
+    "node1" -> "node2"  // muduo_net -> muduo_base
+    "node3" [ label = "pthread", shape = septagon ];
+    "node2" -> "node3"  // muduo_base -> pthread
+    "node4" [ label = "rt", shape = septagon ];
+    "node2" -> "node4"  // muduo_base -> rt
+    "node22" [ label = "protobuf", shape = septagon ];
+    "node51" -> "node22"  // protobuf_codec -> protobuf
+    "node52" [ label = "z", shape = septagon ];
+    "node51" -> "node52"  // protobuf_codec -> z
+    "node53" [ label = "query_proto", shape = octagon ];
+    "node50" -> "node53" [ style = dotted ] // protobuf_client -> query_proto
+    "node22" [ label = "protobuf", shape = septagon ];
+    "node53" -> "node22"  // query_proto -> protobuf
+    "node3" [ label = "pthread", shape = septagon ];
+    "node53" -> "node3"  // query_proto -> pthread
+}

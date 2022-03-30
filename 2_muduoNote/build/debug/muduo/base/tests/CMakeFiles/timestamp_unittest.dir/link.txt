@@ -1,0 +1,1 @@
+g++ -g -D_FILE_OFFSET_BITS=64 -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -march=native -rdynamic -O0 -rdynamic CMakeFiles/timestamp_unittest.dir/Timestamp_unittest.cc.o -o ../../../bin/timestamp_unittest  ../../../lib/libmuduo_base.a -lpthread -lrt 

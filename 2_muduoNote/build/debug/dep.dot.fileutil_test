@@ -1,0 +1,12 @@
+digraph "fileutil_test" {
+node [
+  fontsize = "12"
+];
+    "node14" [ label = "fileutil_test", shape = egg ];
+    "node1" [ label = "muduo_base", shape = octagon ];
+    "node14" -> "node1" [ style = dotted ] // fileutil_test -> muduo_base
+    "node2" [ label = "pthread", shape = septagon ];
+    "node1" -> "node2"  // muduo_base -> pthread
+    "node3" [ label = "rt", shape = septagon ];
+    "node1" -> "node3"  // muduo_base -> rt
+}

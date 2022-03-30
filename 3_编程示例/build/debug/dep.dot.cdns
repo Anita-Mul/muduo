@@ -1,0 +1,18 @@
+digraph "cdns" {
+node [
+  fontsize = "12"
+];
+    "node15" [ label = "cdns", shape = egg ];
+    "node16" [ label = "muduo_cdns", shape = octagon ];
+    "node15" -> "node16" [ style = dotted ] // cdns -> muduo_cdns
+    "node17" [ label = "cares", shape = septagon ];
+    "node16" -> "node17"  // muduo_cdns -> cares
+    "node1" [ label = "muduo_net", shape = octagon ];
+    "node16" -> "node1"  // muduo_cdns -> muduo_net
+    "node2" [ label = "muduo_base", shape = octagon ];
+    "node1" -> "node2"  // muduo_net -> muduo_base
+    "node3" [ label = "pthread", shape = septagon ];
+    "node2" -> "node3"  // muduo_base -> pthread
+    "node4" [ label = "rt", shape = septagon ];
+    "node2" -> "node4"  // muduo_base -> rt
+}

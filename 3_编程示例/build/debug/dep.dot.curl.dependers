@@ -1,0 +1,12 @@
+digraph "curl" {
+node [
+  fontsize = "12"
+];
+    "node20" [ label = "curl", shape = septagon ];
+    "node19" [ label = "muduo_curl", shape = octagon ];
+    "node19" -> "node20"  // muduo_curl -> curl
+    "node18" [ label = "curl_download", shape = egg ];
+    "node18" -> "node19" [ style = dotted ] // curl_download -> muduo_curl
+    "node37" [ label = "mcurl", shape = egg ];
+    "node37" -> "node19" [ style = dotted ] // mcurl -> muduo_curl
+}

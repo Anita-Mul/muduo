@@ -1,0 +1,12 @@
+digraph "protobuf_dispatcher_test" {
+node [
+  fontsize = "12"
+];
+    "node56" [ label = "protobuf_dispatcher_test", shape = egg ];
+    "node53" [ label = "query_proto", shape = octagon ];
+    "node56" -> "node53" [ style = dotted ] // protobuf_dispatcher_test -> query_proto
+    "node22" [ label = "protobuf", shape = septagon ];
+    "node53" -> "node22"  // query_proto -> protobuf
+    "node3" [ label = "pthread", shape = septagon ];
+    "node53" -> "node3"  // query_proto -> pthread
+}

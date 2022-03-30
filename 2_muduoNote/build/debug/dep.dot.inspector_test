@@ -1,0 +1,18 @@
+digraph "inspector_test" {
+node [
+  fontsize = "12"
+];
+    "node21" [ label = "inspector_test", shape = egg ];
+    "node22" [ label = "muduo_inspect", shape = octagon ];
+    "node21" -> "node22" [ style = dotted ] // inspector_test -> muduo_inspect
+    "node17" [ label = "muduo_http", shape = octagon ];
+    "node22" -> "node17"  // muduo_inspect -> muduo_http
+    "node18" [ label = "muduo_net", shape = octagon ];
+    "node17" -> "node18"  // muduo_http -> muduo_net
+    "node1" [ label = "muduo_base", shape = octagon ];
+    "node18" -> "node1"  // muduo_net -> muduo_base
+    "node2" [ label = "pthread", shape = septagon ];
+    "node1" -> "node2"  // muduo_base -> pthread
+    "node3" [ label = "rt", shape = septagon ];
+    "node1" -> "node3"  // muduo_base -> rt
+}

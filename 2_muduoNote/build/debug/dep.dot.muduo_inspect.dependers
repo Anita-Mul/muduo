@@ -1,0 +1,8 @@
+digraph "muduo_inspect" {
+node [
+  fontsize = "12"
+];
+    "node22" [ label = "muduo_inspect", shape = octagon ];
+    "node21" [ label = "inspector_test", shape = egg ];
+    "node21" -> "node22" [ style = dotted ] // inspector_test -> muduo_inspect
+}

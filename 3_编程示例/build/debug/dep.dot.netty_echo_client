@@ -1,0 +1,14 @@
+digraph "netty_echo_client" {
+node [
+  fontsize = "12"
+];
+    "node44" [ label = "netty_echo_client", shape = egg ];
+    "node1" [ label = "muduo_net", shape = octagon ];
+    "node44" -> "node1" [ style = dotted ] // netty_echo_client -> muduo_net
+    "node2" [ label = "muduo_base", shape = octagon ];
+    "node1" -> "node2"  // muduo_net -> muduo_base
+    "node3" [ label = "pthread", shape = septagon ];
+    "node2" -> "node3"  // muduo_base -> pthread
+    "node4" [ label = "rt", shape = septagon ];
+    "node2" -> "node4"  // muduo_base -> rt
+}

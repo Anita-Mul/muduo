@@ -1,0 +1,1 @@
+g++ -g -D_FILE_OFFSET_BITS=64 -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -march=native -rdynamic -O0 -rdynamic CMakeFiles/blockingqueue_test.dir/BlockingQueue_test.cc.o -o ../../../bin/blockingqueue_test  ../../../lib/libmuduo_base.a -lpthread -lrt 
