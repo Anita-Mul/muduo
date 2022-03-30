@@ -1,8 +1,0 @@
-digraph "boost_unit_test_framework" {
-node [
-  fontsize = "12"
-];
-    "node28" [ label = "boost_unit_test_framework", shape = septagon ];
-    "node27" [ label = "httprequest_unittest", shape = egg ];
-    "node27" -> "node28" [ style = dotted ] // httprequest_unittest -> boost_unit_test_framework
-}

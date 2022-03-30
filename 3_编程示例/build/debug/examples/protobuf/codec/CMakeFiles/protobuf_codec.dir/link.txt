@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../../lib/libprotobuf_codec.a CMakeFiles/protobuf_codec.dir/codec.cc.o
-/usr/bin/ranlib ../../../lib/libprotobuf_codec.a

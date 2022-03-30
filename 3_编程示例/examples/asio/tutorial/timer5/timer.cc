@@ -8,59 +8,59 @@
 
 class Printer : boost::noncopyable
 {
- public:
-  Printer(muduo::net::EventLoop* loop1, muduo::net::EventLoop* loop2)
-    : loop1_(loop1),
-      loop2_(loop2),
-      count_(0)
-  {
-    loop1_->runAfter(1, boost::bind(&Printer::print1, this));
-    loop2_->runAfter(1, boost::bind(&Printer::print2, this));
-  }
+    public:
+        Printer(muduo::net::EventLoop* loop1, muduo::net::EventLoop* loop2)
+          : loop1_(loop1),
+            loop2_(loop2),
+            count_(0)
+        {
+            loop1_->runAfter(1, boost::bind(&Printer::print1, this));
+            loop2_->runAfter(1, boost::bind(&Printer::print2, this));
+        }
 
-  ~Printer()
-  {
-    std::cout << "Final count is " << count_ << "\n";
-  }
+        ~Printer()
+        {
+            std::cout << "Final count is " << count_ << "\n";
+        }
 
-  void print1()
-  {
-    muduo::MutexLockGuard lock(mutex_);
-    if (count_ < 10)
-    {
-      std::cout << "Timer 1: " << count_ << "\n";
-      ++count_;
+        void print1()
+        {
+            muduo::MutexLockGuard lock(mutex_);
 
-      loop1_->runAfter(1, boost::bind(&Printer::print1, this));
-    }
-    else
-    {
-      loop1_->quit();
-    }
-  }
+            if (count_ < 10)
+            {
+                std::cout << "Timer 1: " << count_ << "\n";
+                ++count_;
 
-  void print2()
-  {
-    muduo::MutexLockGuard lock(mutex_);
-    if (count_ < 10)
-    {
-      std::cout << "Timer 2: " << count_ << "\n";
-      ++count_;
+                loop1_->runAfter(1, boost::bind(&Printer::print1, this));
+            }
+            else
+            {
+                loop1_->quit();
+            }
+        }
 
-      loop2_->runAfter(1, boost::bind(&Printer::print2, this));
-    }
-    else
-    {
-      loop2_->quit();
-    }
-  }
+        void print2()
+        {
+            muduo::MutexLockGuard lock(mutex_);
+            if (count_ < 10)
+            {
+                std::cout << "Timer 2: " << count_ << "\n";
+                ++count_;
 
-private:
+                loop2_->runAfter(1, boost::bind(&Printer::print2, this));
+            }
+            else
+            {
+                loop2_->quit();
+            }
+        }
 
-  muduo::MutexLock mutex_;
-  muduo::net::EventLoop* loop1_;
-  muduo::net::EventLoop* loop2_;
-  int count_;
+    private:
+        muduo::MutexLock mutex_;
+        muduo::net::EventLoop* loop1_;
+        muduo::net::EventLoop* loop2_;
+        int count_;
 };
 
 int main()

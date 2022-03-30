@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../lib/libmuduo_cdns.a CMakeFiles/muduo_cdns.dir/Resolver.cc.o
-/usr/bin/ranlib ../../lib/libmuduo_cdns.a

@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../../lib/libresolver_proto.a CMakeFiles/resolver_proto.dir/resolver.pb.cc.o
-/usr/bin/ranlib ../../../lib/libresolver_proto.a

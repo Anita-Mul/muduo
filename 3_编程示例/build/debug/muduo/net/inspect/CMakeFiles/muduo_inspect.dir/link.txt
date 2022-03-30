@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../../lib/libmuduo_inspect.a CMakeFiles/muduo_inspect.dir/Inspector.cc.o CMakeFiles/muduo_inspect.dir/ProcessInspector.cc.o
-/usr/bin/ranlib ../../../lib/libmuduo_inspect.a
