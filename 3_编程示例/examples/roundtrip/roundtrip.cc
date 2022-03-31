@@ -12,117 +12,131 @@ const size_t frameLen = 2*sizeof(int64_t);
 
 void serverConnectionCallback(const TcpConnectionPtr& conn)
 {
-  LOG_TRACE << conn->name() << " " << conn->peerAddress().toIpPort() << " -> "
-        << conn->localAddress().toIpPort() << " is "
-        << (conn->connected() ? "UP" : "DOWN");
-  if (conn->connected())
-  {
-    conn->setTcpNoDelay(true);
-  }
-  else
-  {
-  }
+    LOG_TRACE << conn->name() << " " << conn->peerAddress().toIpPort() << " -> "
+          << conn->localAddress().toIpPort() << " is "
+          << (conn->connected() ? "UP" : "DOWN");
+
+    if (conn->connected())
+    {
+      // 因为采用的是消息一到，立刻发送，不用等到全部数据到来
+      conn->setTcpNoDelay(true);
+    }
+    else
+    {
+    }
 }
 
 void serverMessageCallback(const TcpConnectionPtr& conn,
                            Buffer* buffer,
                            muduo::Timestamp receiveTime)
 {
-  int64_t message[2];
-  while (buffer->readableBytes() >= frameLen)
-  {
-    memcpy(message, buffer->peek(), frameLen);
-    buffer->retrieve(frameLen);
-    message[1] = receiveTime.microSecondsSinceEpoch();
-    conn->send(message, sizeof message);
-  }
+    int64_t message[2];
+
+    while (buffer->readableBytes() >= frameLen)
+    {
+        // 取出16个字节，拷贝到 message
+        memcpy(message, buffer->peek(), frameLen);
+        buffer->retrieve(frameLen);
+        // 把 message[1] 改为服务器端收到消息的时刻 T2
+        message[1] = receiveTime.microSecondsSinceEpoch();
+        conn->send(message, sizeof message);
+    }
 }
 
 void runServer(uint16_t port)
 {
-  EventLoop loop;
-  TcpServer server(&loop, InetAddress(port), "ClockServer");
-  server.setConnectionCallback(serverConnectionCallback);
-  server.setMessageCallback(serverMessageCallback);
-  server.start();
-  loop.loop();
+    EventLoop loop;
+    TcpServer server(&loop, InetAddress(port), "ClockServer");
+    server.setConnectionCallback(serverConnectionCallback);
+    server.setMessageCallback(serverMessageCallback);
+    server.start();
+    loop.loop();
 }
+
+// ——————————————————————————————————————————————————————————————————————————
 
 TcpConnectionPtr clientConnection;
 
 void clientConnectionCallback(const TcpConnectionPtr& conn)
 {
-  LOG_TRACE << conn->localAddress().toIpPort() << " -> "
-        << conn->peerAddress().toIpPort() << " is "
-        << (conn->connected() ? "UP" : "DOWN");
-  if (conn->connected())
-  {
-    clientConnection = conn;
-    conn->setTcpNoDelay(true);
-  }
-  else
-  {
-    clientConnection.reset();
-  }
+    LOG_TRACE << conn->localAddress().toIpPort() << " -> "
+          << conn->peerAddress().toIpPort() << " is "
+          << (conn->connected() ? "UP" : "DOWN");
+
+    if (conn->connected())
+    {
+        // 保存这个连接
+        clientConnection = conn;
+        conn->setTcpNoDelay(true);
+    }
+    else
+    {
+        clientConnection.reset();
+    }
 }
 
 void clientMessageCallback(const TcpConnectionPtr&,
                            Buffer* buffer,
                            muduo::Timestamp receiveTime)
 {
-  int64_t message[2];
-  while (buffer->readableBytes() >= frameLen)
-  {
-    memcpy(message, buffer->peek(), frameLen);
-    buffer->retrieve(frameLen);
-    int64_t send = message[0];
-    int64_t their = message[1];
-    int64_t back = receiveTime.microSecondsSinceEpoch();
-    int64_t mine = (back+send)/2;
-    LOG_INFO << "round trip " << back - send
-             << " clock error " << their - mine;
-  }
+    int64_t message[2];
+    while (buffer->readableBytes() >= frameLen)
+    {
+        memcpy(message, buffer->peek(), frameLen);
+        buffer->retrieve(frameLen);
+        int64_t send = message[0];  // T1
+        int64_t their = message[1]; // T2
+        int64_t back = receiveTime.microSecondsSinceEpoch();  // T3
+        int64_t mine = (back+send)/2;
+        LOG_INFO << "round trip " << back - send
+                << " clock error " << their - mine;
+    }
 }
 
 void sendMyTime()
 {
-  if (clientConnection)
-  {
-    int64_t message[2] = { 0, 0 };
-    message[0] = Timestamp::now().microSecondsSinceEpoch();
-    clientConnection->send(message, sizeof message);
-  }
+    if (clientConnection)
+    {
+        int64_t message[2] = { 0, 0 };
+        // 获取当前时间
+        // 每个 0.2s 发送
+        message[0] = Timestamp::now().microSecondsSinceEpoch();
+        clientConnection->send(message, sizeof message);
+    }
 }
 
 void runClient(const char* ip, uint16_t port)
 {
-  EventLoop loop;
-  TcpClient client(&loop, InetAddress(ip, port), "ClockClient");
-  client.enableRetry();
-  client.setConnectionCallback(clientConnectionCallback);
-  client.setMessageCallback(clientMessageCallback);
-  client.connect();
-  loop.runEvery(0.2, sendMyTime);
-  loop.loop();
+    EventLoop loop;
+    TcpClient client(&loop, InetAddress(ip, port), "ClockClient");
+    client.enableRetry();
+    client.setConnectionCallback(clientConnectionCallback);
+    client.setMessageCallback(clientMessageCallback);
+    client.connect();
+    loop.runEvery(0.2, sendMyTime);
+    loop.loop();
 }
 
 int main(int argc, char* argv[])
 {
-  if (argc > 2)
-  {
-    uint16_t port = static_cast<uint16_t>(atoi(argv[2]));
-    if (strcmp(argv[1], "-s") == 0)
+    if (argc > 2)
     {
-      runServer(port);
+        uint16_t port = static_cast<uint16_t>(atoi(argv[2]));
+
+        if (strcmp(argv[1], "-s") == 0)
+        {
+            // 以服务器端的方式运行
+            runServer(port);
+        }
+        else
+        { 
+            // 以客户端的方式运行
+            runClient(argv[1], port);
+        }
     }
     else
     {
-      runClient(argv[1], port);
+        printf("Usage:\n%s -s port\n%s ip port\n", argv[0], argv[0]);
     }
-  }
-  else
-  {
-    printf("Usage:\n%s -s port\n%s ip port\n", argv[0], argv[0]);
-  }
 }
 
