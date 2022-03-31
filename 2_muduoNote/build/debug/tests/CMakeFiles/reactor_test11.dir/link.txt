@@ -1,1 +1,0 @@
-g++ -g -D_FILE_OFFSET_BITS=64 -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -march=native -rdynamic -O0 -rdynamic CMakeFiles/reactor_test11.dir/Reactor_test11.cc.o -o ../bin/reactor_test11  ../lib/libmuduo_net.a ../lib/libmuduo_base.a -lpthread -lrt 

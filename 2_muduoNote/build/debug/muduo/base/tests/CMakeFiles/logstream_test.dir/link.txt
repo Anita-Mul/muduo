@@ -1,1 +1,0 @@
-g++ -g -D_FILE_OFFSET_BITS=64 -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -march=native -rdynamic -O0 -rdynamic CMakeFiles/logstream_test.dir/LogStream_test.cc.o -o ../../../bin/logstream_test  ../../../lib/libmuduo_base.a -lboost_unit_test_framework -lpthread -lrt 

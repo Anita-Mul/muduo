@@ -1,1 +1,0 @@
-g++ -g -D_FILE_OFFSET_BITS=64 -Wall -Wextra -Werror -Wconversion -Wno-unused-parameter -Wold-style-cast -Woverloaded-virtual -Wpointer-arith -Wshadow -Wwrite-strings -march=native -rdynamic -O0 -rdynamic CMakeFiles/tcpclient_test.dir/TcpClient_test.cc.o -o ../bin/tcpclient_test  ../lib/libmuduo_net.a ../lib/libmuduo_base.a -lpthread -lrt 

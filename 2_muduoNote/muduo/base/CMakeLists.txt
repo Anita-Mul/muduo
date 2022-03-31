@@ -1,4 +1,5 @@
 set(base_SRCS
+  AsyncLogging.cc
   Condition.cc
   CountDownLatch.cc
   Exception.cc

@@ -1,3 +1,6 @@
+add_executable(asynclogging_test AsyncLogging_test.cc)
+target_link_libraries(asynclogging_test muduo_base)
+
 add_executable(atomic_unittest Atomic_unittest.cc)
 #target_link_libraries(atomic_unittest muduo_base)
 
