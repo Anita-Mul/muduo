@@ -7,6 +7,11 @@
 using namespace muduo;
 using namespace muduo::net;
 
+/**
+ * 注意每次建立连接的时候我们都去重新打开那个文件，使得程序中文件描述符的数量翻倍（每个连接占一个socket fd和一个file fd），
+ * 这是考虑到文件有可能被其他程序修改。如果文件是immutable的，一种改进措施是：整个程序可以共享同一个文件描述符，然后每个连
+ * 接记住自己当前的偏移量，在onWriteComplete()回调函数里用pread(2)来读取数据
+ */
 void onHighWaterMark(const TcpConnectionPtr& conn, size_t len)
 {
     LOG_INFO << "HighWaterMark " << len;
@@ -57,6 +62,7 @@ void onConnection(const TcpConnectionPtr& conn)
     }
 }
 
+// 在onWriteComplete()回调函数中读取下一块文件数据，继续发送。
 void onWriteComplete(const TcpConnectionPtr& conn)
 {
     FILE* fp = boost::any_cast<FILE*>(conn->getContext());

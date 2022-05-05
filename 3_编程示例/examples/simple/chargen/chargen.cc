@@ -6,6 +6,11 @@
 #include <boost/bind.hpp>
 #include <stdio.h>
 
+/**
+ * Chargen协议很特殊，它只发送数据，不接收数据。而且，它发送数据的速度
+ * 不能快过客户端接收的速度，因此需要关注“三个半事件”中的半个“消息／数
+ * 据发送完毕”事件（onWriteComplete）
+ */
 using namespace muduo;
 using namespace muduo::net;
 

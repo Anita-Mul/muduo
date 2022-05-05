@@ -116,10 +116,13 @@ namespace muduo
 
                 ConnectionCallback connectionCallback_;
                 MessageCallback messageCallback_;                         // 在TcoConnection中的handleread函数中被调用
+                CloseCallback closeCallback_;
+
+                
                 WriteCompleteCallback writeCompleteCallback_;		      // 数据发送完毕回调函数，即所有的用户数据都已拷贝到内核缓冲区时回调该函数
                                                                           // outputBuffer_被清空也会回调该函数，可以理解为低水位标回调函数
                 HighWaterMarkCallback highWaterMarkCallback_;	          // 高水位标回调函数
-                CloseCallback closeCallback_;
+                
                 
                 size_t highWaterMark_;		                              // 高水位标
                 Buffer inputBuffer_;			                          // 应用层接收缓冲区

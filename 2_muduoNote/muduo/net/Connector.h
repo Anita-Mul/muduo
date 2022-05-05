@@ -46,8 +46,8 @@ namespace muduo
 
             private:
                 enum States { kDisconnected, kConnecting, kConnected };
-                static const int kMaxRetryDelayMs = 30*1000;			// 30秒，最大重连延迟时间
-                static const int kInitRetryDelayMs = 500;				  // 0.5秒，初始状态，连接不上，0.5秒后重连
+                static const int kMaxRetryDelayMs = 30*1000;			 // 30秒，最大重连延迟时间
+                static const int kInitRetryDelayMs = 500;				 // 0.5秒，初始状态，连接不上，0.5秒后重连
 
                 void setState(States s) { state_ = s; }
                 void startInLoop();
@@ -61,12 +61,12 @@ namespace muduo
                 void resetChannel();
 
                 EventLoop* loop_;			                            // 所属EventLoop
-                InetAddress serverAddr_;	                        // 服务器端地址
-                bool connect_;                                    // atomic
-                States state_;                                    // FIXME: use atomic variable
-                boost::scoped_ptr<Channel> channel_;	            // Connector所对应的Channel
-                NewConnectionCallback newConnectionCallback_;		  // 连接成功回调函数，
-                int retryDelayMs_;		                            // 重连延迟时间（单位：毫秒）
+                InetAddress serverAddr_;	                            // 服务器端地址
+                bool connect_;                                          // atomic
+                States state_;                                          // FIXME: use atomic variable
+                boost::scoped_ptr<Channel> channel_;	                // Connector所对应的Channel
+                NewConnectionCallback newConnectionCallback_;		    // 连接成功回调函数，
+                int retryDelayMs_;		                                // 重连延迟时间（单位：毫秒）
         };
     }
 }

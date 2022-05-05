@@ -6,6 +6,7 @@
 using namespace muduo;
 using namespace muduo::net;
 
+// 服务端只需要关注“三个半事件”中的“连接已建立”事件
 int main()
 {
   LOG_INFO << "pid = " << getpid();

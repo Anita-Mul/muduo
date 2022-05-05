@@ -71,6 +71,10 @@ class TimeClient : boost::noncopyable
 };
 
 
+/**
+ * 因为time服务端发送的是二进制数据，不便直接阅读，我们编写一个客户端来解析并打印收到的4个字节数据。
+ * 这个程序只需要关注“三个半事件”中的“消息／数据到达”事件
+ */
 int main(int argc, char* argv[])
 {
     LOG_INFO << "pid = " << getpid();

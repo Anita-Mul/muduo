@@ -34,6 +34,7 @@ void DaytimeServer::onConnection(const TcpConnectionPtr& conn)
     if (conn->connected())
     {
         conn->send(Timestamp::now().toFormattedString() + "\n");
+        // 主动断开连接
         conn->shutdown();
     }
 }

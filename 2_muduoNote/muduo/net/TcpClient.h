@@ -45,6 +45,7 @@ namespace muduo
                 }
 
                 bool retry() const;
+                
                 void enableRetry() { retry_ = true; }
 
                 /// Set connection callback.
@@ -73,17 +74,17 @@ namespace muduo
                 const string name_;		                            // 名称
 
                 ConnectionCallback connectionCallback_;		        // 连接建立回调函数
-                MessageCallback messageCallback_;				          // 消息到来回调函数
+                MessageCallback messageCallback_;				    // 消息到来回调函数
                 WriteCompleteCallback writeCompleteCallback_;	    // 数据发送完毕回调函数
 
-                bool retry_;                                      // 重连，是指连接建立之后又断开的时候是否重连
-                bool connect_;                                    // atomic
+                bool retry_;                                        // 重连，是指连接建立之后又断开的时候是否重连
+                bool connect_;                                      // atomic
                 
                 // always in loop thread
-                int nextConnId_;			                            // name_ + nextConnId_用于标识一个连接
+                int nextConnId_;			                        // name_ + nextConnId_用于标识一个连接
                 
                 mutable MutexLock mutex_;
-                TcpConnectionPtr connection_;                     // Connector连接成功以后，得到一个TcpConnection
+                TcpConnectionPtr connection_;                       // Connector连接成功以后，得到一个TcpConnection
         };
     }
 }

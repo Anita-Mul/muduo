@@ -186,7 +186,6 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
             }
         }
     }
-
     assert(remaining <= len);
     
     // 没有错误，并且还有未写完的数据（说明内核发送缓冲区满，要将未写完的数据添加到output buffer中）
